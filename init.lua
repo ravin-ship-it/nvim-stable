@@ -768,6 +768,38 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
+-- Autocommand for autosaving feature
+local autosave_enabled = false
+local autosave_timer = nil
+
+vim.api.nvim_create_user_command("AS", function()
+    autosave_enabled = not autosave_enabled
+    vim.notify("AutoSave: " .. (autosave_enabled and "ON" or "OFF"))
+end, {})
+
+local function start_autosave_timer()
+    if autosave_timer then
+        vim.fn.timer_stop(autosave_timer)
+    end
+
+    autosave_timer = vim.fn.timer_start(1000, function()
+        if autosave_enabled and vim.bo.modified and vim.fn.expand("%") ~= "" then
+            vim.cmd("write") -- Save file (and trigger format on save if you configured it)
+            vim.schedule(function()
+                vim.notify("File saved successfully", vim.log.levels.INFO, { title = "AutoSave" })
+            end)
+        end
+    end)
+end
+
+vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
+    callback = function()
+        if autosave_enabled then
+            start_autosave_timer()
+        end
+    end,
+})
+
 -- Keybindings for Telescope
 vim.keymap.set("n", "<leader>ff", ":Telescope find_files<CR>", { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>fg", ":Telescope live_grep<CR>", { noremap = true, silent = true })
