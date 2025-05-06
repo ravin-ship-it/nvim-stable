@@ -211,7 +211,7 @@ require("lazy").setup({
                 cmd = { "typescript-language-server", "--stdio" },
                 capabilities = capabilities,
                 autostart = true,
-                filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+                filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "html" },
                 root_dir = require("lspconfig.util").root_pattern("package.json", "tsconfig.json", ".git"),
                 settings = {
                     javascript = {
