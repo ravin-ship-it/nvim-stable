@@ -466,6 +466,81 @@ require("lazy").setup({
                         '@import url("https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css");'),
                 }),
             })
+
+            -- MarkDown Preview
+            luasnip.add_snippets("html", {
+                luasnip.s("mdpreview", {
+                    luasnip.t({
+                        "<!DOCTYPE html>",
+                        "<html>",
+                        "",
+                        "<head>",
+                        '    <meta charset="UTF-8" />',
+                        "    <title>Markdown Preview</title>",
+                        '    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>',
+                        '    <link href="https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css" rel="stylesheet">',
+                        "    <style>",
+                        "        body {",
+                        "            width: 100%;",
+                        "            margin: 2rem auto;",
+                        "            padding: 2rem;",
+                        "        }",
+                        "",
+                        "        .markdown-body {",
+                        "            font-family: system-ui, sans-serif;",
+                        "        }",
+                        "    </style>",
+                        "</head>",
+                        "",
+                        '<body class="markdown-body">',
+                        '    <div id="content">Loading markdown...</div>',
+                        "    <script>",
+                        '        fetch("README.md")',
+                        "            .then(response => response.text())",
+                        "            .then(text => {",
+                        '                document.getElementById("content").innerHTML = marked.parse(text);',
+                        "            });",
+                        "    </script>",
+                        "</body>",
+                        "",
+                        "</html>"
+                    }),
+                }),
+            })
+        end,
+    },
+
+    -- SQL / MariaDB support
+    {
+        "tpope/vim-dadbod",
+        cmd = { "DB", "DBUI", "DBUIToggle", "DBUIFindBuffer", "DBUIRenameBuffer", "DBUILastQueryInfo" },
+        dependencies = {
+            {
+                "kristijanhusak/vim-dadbod-ui",
+                cmd = { "DBUI", "DBUIToggle", "DBUIFindBuffer", "DBUIRenameBuffer", "DBUILastQueryInfo" },
+            },
+            {
+                "kristijanhusak/vim-dadbod-completion",
+                ft = { "sql", "mysql", "plsql" },
+            },
+        },
+        config = function()
+            vim.g.db_ui_save_location = vim.fn.stdpath("data") .. "/db_ui"
+            vim.g.db_ui_use_nerd_fonts = 1
+            vim.g.db_ui_show_database_icon = 1
+
+            vim.api.nvim_create_autocmd("FileType", {
+                pattern = { "sql", "mysql", "plsql" },
+                callback = function()
+                    local cmp = require("cmp")
+                    cmp.setup.buffer({
+                        sources = {
+                            { name = "vim-dadbod-completion" },
+                            { name = "buffer" },
+                        },
+                    })
+                end,
+            })
         end,
     },
 
@@ -692,6 +767,48 @@ require("lazy").setup({
                 extensions = {},
             })
         end
+    },
+
+    -- Toggle Terminal
+    {
+        "akinsho/toggleterm.nvim",
+        config = function()
+            require("toggleterm").setup({
+                size = 20,
+                open_mapping = [[<C-t>]],
+                direction = "horizontal",
+                start_in_insert = true,
+                insert_mappings = true,
+                terminal_mappings = true,
+                persist_mode = false, -- always return to insert mode on toggle
+                shade_terminals = true,
+                shading_factor = 2,
+                hide_numbers = true,
+                shade_filetypes = {},
+                persist_size = true,
+                close_on_exit = true,
+                shell = vim.o.shell,
+                float_opts = {
+                    border = "curved",
+                    winblend = 0,
+                    highlights = {
+                        border = "Normal",
+                        background = "Normal",
+                    },
+                },
+            })
+
+            -- Optional: Toggle floating terminal with <leader>tf
+            vim.keymap.set("n", "<leader>tf", "<cmd>ToggleTerm direction=float<cr>", { desc = "ToggleTerm Float" })
+
+            -- Optional: Toggle vertical terminal with <leader>tv
+            vim.keymap.set("n", "<leader>tv", "<cmd>ToggleTerm direction=vertical size=60<cr>",
+                { desc = "ToggleTerm Vertical" })
+
+            -- Optional: Toggle bottom terminal with <leader>th
+            vim.keymap.set("n", "<leader>th", "<cmd>ToggleTerm direction=horizontal<cr>",
+                { desc = "ToggleTerm Horizontal" })
+        end,
     },
 
     -- More plugins goes here
