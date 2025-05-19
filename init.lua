@@ -554,6 +554,13 @@ require("lazy").setup({
         end
     },
 
+    -- Icon support for Neovim
+    {
+        "nvim-tree/nvim-web-devicons",
+        lazy = true,
+        opts = { default = true }
+    },
+
     -- none-ls
     {
         "nvimtools/none-ls.nvim",
