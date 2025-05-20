@@ -148,7 +148,7 @@ require("lazy").setup({
                 settings = {
                     html = {
                         validate = true,
-                        format = { enable = true, indentWidth = 4 },
+                        format = { enable = true, indentWidth = 4, wrapLineLength = 0 },
                         hover = true,
                         completion = true,
                         autoClosingTags = true,
@@ -779,8 +779,8 @@ require("lazy").setup({
     -- Toggle Terminal
     {
         "akinsho/toggleterm.nvim",
-        version = "*",                  -- Use latest stable version
-        event = "VeryLazy",             -- Load only when needed
+        version = "*",                      -- Use latest stable version
+        event = "VeryLazy",                 -- Load only when needed
         cmd = { "ToggleTerm", "TermExec" }, -- Commands that trigger loading
         keys = {
             { "<C-t>",      desc = "Toggle terminal" },
@@ -902,6 +902,7 @@ vim.opt.termguicolors = true                              -- Enable true color s
 vim.opt.mouse = "a"                                       -- Enable mouse support
 vim.opt.fileencoding = "utf-8"                            -- Ensure files are written in UTF-8
 vim.opt.encoding = "utf-8"                                -- Set internal encoding (redundant but explicit)
+vim.opt.textwidth = 0
 vim.opt.wrap = false                                      -- Disable wrapping completely
 vim.opt.cursorline = true                                 -- Highlight the current line
 vim.opt.incsearch = true                                  -- Show search matches as you type
