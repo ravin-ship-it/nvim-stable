@@ -70,12 +70,10 @@ require("lazy").setup({
         end
     },
 
-    -- LSP and diagnostics setup based on none-ls
+    -- LSP and diagnostics setup using vim.lsp.config (nvim 0.11+)
     {
         "neovim/nvim-lspconfig",
         config = function()
-            local lspconfig = require("lspconfig")
-
             -- Enable inline error messages
             vim.diagnostic.config({
                 virtual_text = {
@@ -107,37 +105,11 @@ require("lazy").setup({
             capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
             -- Configure HTML LSP
-            -- lspconfig.html.setup({
-            --     cmd = { "vscode-html-language-server", "--stdio" },
-            --     capabilities = capabilities,
-            --     autostart = true,
-            --     filetypes = { "html" },
-            --     settings = {
-            --         html = {
-            --             validate = true,
-            --             format = { enable = true, indentWidth = 4 },
-            --             hover = true,
-            --             completion = true,
-            --             autoClosingTags = true,
-            --             suggest = {
-            --                 html5 = true,
-            --                 classAttribute = true,
-            --                 idAttribute = true,
-            --             },
-            --         },
-            --         css = { validate = true },
-            --         javascript = { validate = true },
-            --     },
-            --     on_attach = function(client, bufnr)
-            --         setup_format_on_save(client, bufnr)
-            --     end,
-            -- })
-
-            lspconfig.html.setup({
+            vim.lsp.config.html = {
                 cmd = { "vscode-html-language-server", "--stdio" },
-                capabilities = capabilities,
-                autostart = true,
                 filetypes = { "html" },
+                root_markers = { ".git" },
+                capabilities = capabilities,
                 init_options = {
                     provideFormatter = true,
                     embeddedLanguages = {
@@ -162,33 +134,31 @@ require("lazy").setup({
                     css = { validate = true },
                     javascript = { validate = true },
                 },
-                on_attach = function(client, bufnr)
-                    setup_format_on_save(client, bufnr)
-                end,
-            })
+            }
+
+            vim.lsp.enable("html")
 
             -- Configure CSS/SCSS/SASS LSP
-            lspconfig.cssls.setup({
+            vim.lsp.config.cssls = {
                 cmd = { "vscode-css-language-server", "--stdio" },
-                capabilities = capabilities,
-                autostart = true,
                 filetypes = { "css", "scss", "sass" },
+                root_markers = { ".git" },
+                capabilities = capabilities,
                 settings = {
                     css = { validate = true },
                     scss = { validate = true },
                     sass = { validate = true },
                 },
-                on_attach = function(client, bufnr)
-                    setup_format_on_save(client, bufnr)
-                end,
-            })
+            }
+
+            vim.lsp.enable("cssls")
 
             -- Configure Lua LSP
-            lspconfig.lua_ls.setup({
+            vim.lsp.config.lua_ls = {
                 cmd = { "lua-language-server" },
-                capabilities = capabilities,
-                autostart = true,
                 filetypes = { "lua" },
+                root_markers = { ".git" },
+                capabilities = capabilities,
                 settings = {
                     Lua = {
                         diagnostics = {
@@ -202,42 +172,40 @@ require("lazy").setup({
                         format = { enable = true },
                     },
                 },
-                on_attach = function(client, bufnr)
-                    setup_format_on_save(client, bufnr)
-                end,
-            })
+            }
+
+            vim.lsp.enable("lua_ls")
 
             -- Configure TypeScript/JavaScript LSP
-            lspconfig.ts_ls.setup({
+            vim.lsp.config.ts_ls = {
                 cmd = { "typescript-language-server", "--stdio" },
-                capabilities = capabilities,
-                autostart = true,
                 filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "html" },
-                root_dir = require("lspconfig.util").root_pattern("package.json", "tsconfig.json", ".git"),
+                root_markers = { "package.json", "tsconfig.json", ".git" },
+                capabilities = capabilities,
                 settings = {
                     javascript = {
                         validate = true,
-                        suggest = { completeFunctionCalls = true, },
-                        format = { enable = true, },
-                        implicitProjectConfig = { strict = true, },
+                        suggest = { completeFunctionCalls = true },
+                        format = { enable = true },
+                        implicitProjectConfig = { strict = true },
                     },
                     typescript = {
                         validate = true,
-                        suggest = { completeFunctionCalls = true, },
-                        format = { enable = true, },
-                        implicitProjectConfig = { strict = true, },
+                        suggest = { completeFunctionCalls = true },
+                        format = { enable = true },
+                        implicitProjectConfig = { strict = true },
                     },
                 },
-                on_attach = function(client, bufnr)
-                    setup_format_on_save(client, bufnr)
-                end,
-            })
+            }
 
-            -- jsonls configuration block
-            lspconfig.jsonls.setup({
+            vim.lsp.enable("ts_ls")
+
+            -- Configure JSON LSP
+            vim.lsp.config.jsonls = {
                 cmd = { "vscode-json-language-server", "--stdio" },
                 filetypes = { "json", "jsonc" },
-                root_dir = lspconfig.util.root_pattern(".git", vim.fn.getcwd()),
+                root_markers = { ".git" },
+                capabilities = capabilities,
                 settings = {
                     json = {
                         validate = { enable = true },
@@ -248,17 +216,16 @@ require("lazy").setup({
                         },
                     },
                 },
-                capabilities = capabilities,
-                on_attach = function(client, bufnr)
-                    setup_format_on_save(client, bufnr)
-                end,
-            })
+            }
+
+            vim.lsp.enable("jsonls")
 
             -- Configure Python LSP (pylsp)
-            lspconfig.pylsp.setup({
-                capabilities = capabilities,
-                autostart = true,
+            vim.lsp.config.pylsp = {
+                cmd = { "pylsp" },
                 filetypes = { "python" },
+                root_markers = { ".git", "pyproject.toml", "setup.py" },
+                capabilities = capabilities,
                 settings = {
                     pylsp = {
                         plugins = {
@@ -268,37 +235,37 @@ require("lazy").setup({
                         },
                     },
                 },
-                on_attach = function(client, bufnr)
-                    setup_format_on_save(client, bufnr)
-                end,
-            })
+            }
+
+            vim.lsp.enable("pylsp")
 
             -- Configure Java LSP (jdtls)
             local jdtls_path = "/data/data/com.termux/files/home/.local/share/jdtls/bin/jdtls"
-            lspconfig.jdtls.setup({
+            vim.lsp.config.jdtls = {
                 cmd = { jdtls_path },
-                -- other configurations
-                on_attach = function(client, bufnr)
-                    setup_format_on_save(client, bufnr)
-                end,
-            })
+                filetypes = { "java" },
+                root_markers = { ".git", "pom.xml", "build.gradle" },
+                capabilities = capabilities,
+            }
+
+            vim.lsp.enable("jdtls")
 
             -- Configure C++ LSP (clangd)
-            lspconfig.clangd.setup({
-                capabilities = capabilities,
-                autostart = true,
-                filetypes = { "c", "cpp", "objc", "objcpp" },
+            vim.lsp.config.clangd = {
                 cmd = { "clangd", "--background-index" },
-                on_attach = function(client, bufnr)
-                    setup_format_on_save(client, bufnr)
-                end,
-            })
+                filetypes = { "c", "cpp", "objc", "objcpp" },
+                root_markers = { ".git", "compile_commands.json" },
+                capabilities = capabilities,
+            }
 
-            -- Golang Lsp setup
-            lspconfig.gopls.setup({
-                on_attach = function(client, bufnr)
-                    setup_format_on_save(client, bufnr)
-                end,
+            vim.lsp.enable("clangd")
+
+            -- Configure Golang LSP
+            vim.lsp.config.gopls = {
+                cmd = { "gopls" },
+                filetypes = { "go", "gomod", "gowork", "gotmpl" },
+                root_markers = { "go.mod", ".git" },
+                capabilities = capabilities,
                 settings = {
                     gopls = {
                         analyses = {
@@ -308,9 +275,24 @@ require("lazy").setup({
                         staticcheck = true,
                     },
                 },
-            })
+            }
 
-            -- Additional LSP configurations can be added here
+            vim.lsp.enable("gopls")
+
+            -- Setup format on save for all LSP clients
+            vim.api.nvim_create_autocmd("LspAttach", {
+                callback = function(args)
+                    local client = vim.lsp.get_client_by_id(args.data.client_id)
+                    if client and client.server_capabilities.documentFormattingProvider then
+                        vim.api.nvim_create_autocmd("BufWritePre", {
+                            buffer = args.buf,
+                            callback = function()
+                                vim.lsp.buf.format({ bufnr = args.buf })
+                            end,
+                        })
+                    end
+                end,
+            })
         end,
     },
 
