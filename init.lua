@@ -88,6 +88,7 @@ require("lazy").setup({
             })
 
             -- Function to setup formatting on save
+            ---@diagnostic disable-next-line: unused-function, unused-local
             local function setup_format_on_save(client, bufnr)
                 if client.server_capabilities.documentFormattingProvider then
                     vim.api.nvim_create_autocmd("BufWritePre", {
@@ -762,8 +763,8 @@ require("lazy").setup({
     -- Toggle Terminal
     {
         "akinsho/toggleterm.nvim",
-        version = "*",                      -- Use latest stable version
-        event = "VeryLazy",                 -- Load only when needed
+        version = "*",                  -- Use latest stable version
+        event = "VeryLazy",             -- Load only when needed
         cmd = { "ToggleTerm", "TermExec" }, -- Commands that trigger loading
         keys = {
             { "<C-t>",      desc = "Toggle terminal" },
@@ -823,6 +824,16 @@ require("lazy").setup({
                     end,
                 },
             })
+
+            -- Override the <C-t> mapping to open in current file's directory
+            vim.keymap.set("n", "<C-t>", function()
+                local file_dir = vim.fn.expand('%:p:h')
+                if file_dir ~= '' then
+                    require("toggleterm").toggle(nil, nil, file_dir, "float")
+                else
+                    require("toggleterm").toggle()
+                end
+            end, { desc = "Toggle terminal in file directory" })
 
             -- Set up keymaps for regular :term command (not toggleterm)
             local function set_terminal_keymaps()
