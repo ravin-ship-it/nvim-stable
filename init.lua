@@ -122,7 +122,7 @@ require("lazy").setup({
                 settings = {
                     html = {
                         validate = true,
-                        format = { enable = true, indentWidth = 4, wrapLineLength = 0 },
+                        format = { enable = true, indentWidth = 4, wrapLineLength = 0, contentUnformatted = "code" },
                         hover = true,
                         completion = true,
                         autoClosingTags = true,
@@ -763,8 +763,8 @@ require("lazy").setup({
     -- Toggle Terminal
     {
         "akinsho/toggleterm.nvim",
-        version = "*",                  -- Use latest stable version
-        event = "VeryLazy",             -- Load only when needed
+        version = "*",                      -- Use latest stable version
+        event = "VeryLazy",                 -- Load only when needed
         cmd = { "ToggleTerm", "TermExec" }, -- Commands that trigger loading
         keys = {
             { "<C-t>",      desc = "Toggle terminal" },
