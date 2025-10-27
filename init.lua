@@ -693,6 +693,21 @@ require("lazy").setup({
         end
     },
 
+    -- Multi-Cursor Functionality
+    {
+        'mg979/vim-visual-multi',
+        branch = 'master',
+        init = function()
+            -- Remap the main multi-cursor key from Ctrl-n to something else
+            vim.g.VM_maps = {
+                ['Find Under'] = '<C-d>', -- Ctrl-d to select word (like VS Code)
+                ['Find Subword Under'] = '<C-d>', -- Same for subword
+                ['Add Cursor Down'] = '<C-Down>', -- Keep Ctrl-Down for adding cursor below
+                ['Add Cursor Up'] = '<C-Up>', -- Keep Ctrl-Up for adding cursor above
+            }
+        end,
+    },
+
     -- Color Picker setup
     {
         'uga-rosa/ccc.nvim',
