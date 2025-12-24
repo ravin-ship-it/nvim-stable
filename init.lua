@@ -241,15 +241,27 @@ require("lazy").setup({
             vim.lsp.enable("pylsp")
 
             -- Configure Java LSP (jdtls)
-            local jdtls_path = "/data/data/com.termux/files/home/.local/share/jdtls/bin/jdtls"
-            vim.lsp.config.jdtls = {
-                cmd = { jdtls_path },
-                filetypes = { "java" },
-                root_markers = { ".git", "pom.xml", "build.gradle" },
-                capabilities = capabilities,
-            }
+            vim.api.nvim_create_autocmd("FileType", {
+                pattern = "java",
+                callback = function()
+                    local jdtls_path = "/data/data/com.termux/files/home/.local/share/jdtls/bin/jdtls"
+                    local root_markers = { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" }
+                    local root_dir = require("jdtls.setup").find_root(root_markers)
+                    if root_dir == "" then
+                        root_dir = vim.fn.getcwd()
+                    end
 
-            vim.lsp.enable("jdtls")
+                    local workspace_folder = "/data/data/com.termux/files/home/.local/share/jdtls-workspace/" ..
+                        vim.fn.fnamemodify(root_dir, ":p:h:t")
+
+                    local config = {
+                        cmd = { jdtls_path, "-data", workspace_folder },
+                        root_dir = root_dir,
+                        capabilities = capabilities,
+                    }
+                    require("jdtls").start_or_attach(config)
+                end,
+            })
 
             -- Configure C++ LSP (clangd)
             vim.lsp.config.clangd = {
@@ -558,6 +570,10 @@ require("lazy").setup({
 
             null_ls.setup({
                 sources = {
+                    null_ls.builtins.formatting.clang_format.with({
+                        filetypes = { "java" },
+                        extra_args = { "--style={BasedOnStyle:Google,IndentWidth:4,ColumnLimit:0,BreakBeforeBinaryOperators:None}" },
+                    }),
                     eslint.with({
                         diagnostics_format = "[eslint] #{m}\n(#{c})",
                         condition = function(utils)
@@ -901,6 +917,7 @@ require("lazy").setup({
 })
 
 -- General Settings
+vim.g.javascript_indent_disable = 1
 vim.opt.number = true                                     -- Enable absolute line numbers
 vim.opt.relativenumber = false                            -- Enable relative line numbers
 vim.opt.tabstop = 4                                       -- Set tab width to 4 spaces
