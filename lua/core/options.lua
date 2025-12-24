@@ -1,0 +1,25 @@
+-- General Settings
+vim.g.javascript_indent_disable = 1
+vim.opt.number = true                                     -- Enable absolute line numbers
+vim.opt.relativenumber = false                            -- Enable relative line numbers
+vim.opt.tabstop = 4                                       -- Set tab width to 4 spaces
+vim.opt.shiftwidth = 4                                    -- Set indentation width to 4 spaces
+vim.opt.expandtab = true                                  -- Use spaces instead of tabs
+vim.opt.smartindent = true                                -- Enable smart indentation
+vim.opt.autoindent = true                                 -- Enable automatic indentation for new lines
+vim.opt.termguicolors = true                              -- Enable true color support
+vim.opt.mouse = "a"                                       -- Enable mouse support
+vim.opt.fileencoding = "utf-8"                            -- Ensure files are written in UTF-8
+vim.opt.encoding = "utf-8"                                -- Set internal encoding (redundant but explicit)
+vim.opt.textwidth = 0
+vim.opt.wrap = false                                      -- Disable wrapping completely
+vim.opt.cursorline = true                                 -- Highlight the current line
+vim.opt.incsearch = true                                  -- Show search matches as you type
+vim.opt.hlsearch = true                                   -- Highlight all search results
+vim.opt.ignorecase = true                                 -- Ignore case during searches
+vim.opt.smartcase = true                                  -- Override ignorecase if search contains uppercase
+vim.opt.completeopt = { "menuone", "noselect" }           -- Customize completion behavior
+vim.opt.undofile = true                                   -- Enable persistent undo across sessions
+vim.opt.undodir = vim.fn.expand("~/.config/nvim/undodir") -- Specify undo directory
+vim.opt.showmode = false                                  -- Hide mode indicator
+vim.opt.laststatus = 2                                    -- Always show status line
