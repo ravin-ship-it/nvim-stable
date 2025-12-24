@@ -64,6 +64,27 @@ vim.api.nvim_create_user_command('RunCpp', function()
 end, {})
 
 
+-- Custom command to run C files with terminal interaction in a split window
+vim.api.nvim_create_user_command('RunC', function()
+    local filepath = vim.fn.expand('%:p:h')         -- Get file directory
+    local filename = vim.fn.expand('%:t')           -- Get current file name
+    local output_name = filename:gsub("%.c$", "")   -- Remove .c extension for output file
+
+    -- Close any existing terminal buffer
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.fn.getbufvar(buf, '&buftype') == 'terminal' then
+            vim.api.nvim_buf_delete(buf, { force = true })
+        end
+    end
+
+    -- Open vertical split and run the program
+    vim.cmd('vsplit')   -- Open vertical split
+    vim.cmd('wincmd l') -- Move to the right-side split
+    vim.cmd(string.format('term cd "%s" && gcc "%s" -o "%s" && ./"%s"; rm -f "%s"', filepath, filename, output_name,
+        output_name, output_name))
+end, {})
+
+
 -- Assembly Code
 vim.api.nvim_create_user_command('RunAsm', function()
     local filepath = vim.fn.expand('%:p:h')                          -- Get file directory

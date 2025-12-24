@@ -20,6 +20,7 @@ vim.keymap.set("n", "<leader>ch", ":CccHighlighterToggle<CR>", { noremap = true,
 vim.api.nvim_set_keymap('n', '<leader>r', ':lua '
     .. 'if vim.bo.filetype == "java" then vim.cmd("RunJava") '
     .. 'elseif vim.bo.filetype == "javascript" or vim.bo.filetype == "typescript" then vim.cmd("RunJS") '
+    .. 'elseif vim.bo.filetype == "c" then vim.cmd("RunC") '
     .. 'elseif vim.bo.filetype == "cpp" then vim.cmd("RunCpp") '
     .. 'elseif vim.bo.filetype == "asm" or vim.bo.filetype == "s" then vim.cmd("RunAsm") '
     .. 'elseif vim.bo.filetype == "python" then vim.cmd("RunPython") '
