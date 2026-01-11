@@ -23,3 +23,4 @@ vim.opt.undofile = true                                   -- Enable persistent u
 vim.opt.undodir = vim.fn.expand("~/.config/nvim/undodir") -- Specify undo directory
 vim.opt.showmode = false                                  -- Hide mode indicator
 vim.opt.laststatus = 2                                    -- Always show status line
+vim.opt.termbidi = true                                   -- Fix for BiDi text (Arabic/Hindi)
