@@ -10,6 +10,7 @@ vim.opt.smartindent = true                                -- Enable smart indent
 vim.opt.autoindent = true                                 -- Enable automatic indentation for new lines
 vim.opt.termguicolors = true                              -- Enable true color support
 vim.opt.mouse = "a"                                       -- Enable mouse support
+vim.opt.clipboard = "unnamedplus"                         -- Sync with system clipboard
 vim.opt.fileencoding = "utf-8"                            -- Ensure files are written in UTF-8
 vim.opt.encoding = "utf-8"                                -- Set internal encoding (redundant but explicit)
 vim.opt.textwidth = 0
