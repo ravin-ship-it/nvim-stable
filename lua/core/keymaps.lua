@@ -27,3 +27,25 @@ vim.api.nvim_set_keymap('n', '<leader>r', ':lua '
     .. 'elseif vim.bo.filetype == "go" then vim.cmd("RunGo") '
     .. 'else print("Not a supported file type") end<CR>',
     { noremap = true, silent = true })
+
+-- Tab Navigation Shortcuts
+for i = 1, 9 do
+    vim.keymap.set('n', '<leader>' .. i, i .. 'gt', { noremap = true, silent = true, desc = 'Go to tab ' .. i })
+end
+vim.keymap.set('n', '<leader>0', ':tablast<CR>', { noremap = true, silent = true, desc = 'Go to last tab' })
+
+-- Go to specific tab (useful for > 9 tabs)
+vim.keymap.set('n', '<leader>t', function()
+    local tab_num = tonumber(vim.fn.input("Tab Number: "))
+    local total_tabs = vim.fn.tabpagenr('$')
+
+    if tab_num then
+        if tab_num > 0 and tab_num <= total_tabs then
+            vim.cmd(tab_num .. "tabnext")
+        else
+            print("\nInvalid tab number! (Max: " .. total_tabs .. ")")
+        end
+    else
+        print("\nInvalid input!")
+    end
+end, { noremap = true, silent = true, desc = "Go to specific tab number" })
