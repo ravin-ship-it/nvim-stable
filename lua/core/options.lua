@@ -1,4 +1,5 @@
 -- General Settings
+vim.opt.termbidi = true                                   -- Fix for BiDi text (Arabic/Hindi)
 vim.g.javascript_indent_disable = 1
 vim.opt.number = true                                     -- Enable absolute line numbers
 vim.opt.relativenumber = false                            -- Enable relative line numbers
@@ -13,7 +14,7 @@ vim.opt.fileencoding = "utf-8"                            -- Ensure files are wr
 vim.opt.encoding = "utf-8"                                -- Set internal encoding (redundant but explicit)
 vim.opt.textwidth = 0
 vim.opt.wrap = false                                      -- Disable wrapping completely
-vim.opt.cursorline = true                                 -- Highlight the current line
+vim.opt.cursorline = false                                -- Highlight the current line
 vim.opt.incsearch = true                                  -- Show search matches as you type
 vim.opt.hlsearch = true                                   -- Highlight all search results
 vim.opt.ignorecase = true                                 -- Ignore case during searches
@@ -23,4 +24,4 @@ vim.opt.undofile = true                                   -- Enable persistent u
 vim.opt.undodir = vim.fn.expand("~/.config/nvim/undodir") -- Specify undo directory
 vim.opt.showmode = false                                  -- Hide mode indicator
 vim.opt.laststatus = 2                                    -- Always show status line
-vim.opt.termbidi = true                                   -- Fix for BiDi text (Arabic/Hindi)
+vim.opt.scrolloff = 8                                     -- Keep 8 lines above/below cursor
