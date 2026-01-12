@@ -28,3 +28,5 @@ vim.opt.undodir = vim.fn.expand("~/.config/nvim/undodir") -- Specify undo direct
 vim.opt.showmode = false                                  -- Hide mode indicator
 vim.opt.laststatus = 2                                    -- Always show status line
 vim.opt.scrolloff = 8                                     -- Keep 8 lines above/below cursor
+vim.opt.autoread = true                                     -- Automatically reload files changed outside
+vim.opt.updatetime = 250

@@ -115,3 +115,22 @@ vim.api.nvim_create_autocmd('TextYankPost', {
         vim.highlight.on_yank()
     end,
 })
+
+-- Auto-reload files when changed outside
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+    callback = function()
+        if vim.fn.getcmdwintype() == "" then
+            vim.cmd("checktime")
+        end
+    end,
+})
+
+-- Force refresh plugins after external file change
+vim.api.nvim_create_autocmd('FileChangedShellPost', {
+    pattern = '*',
+    callback = function()
+        vim.cmd('redraw!')
+        -- Trigger BufEnter again to wake up plugins like ccc
+        vim.api.nvim_exec_autocmds('BufEnter', { group = nil })
+    end,
+})
