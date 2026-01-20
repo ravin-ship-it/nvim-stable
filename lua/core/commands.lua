@@ -142,6 +142,36 @@ vim.api.nvim_create_user_command('RunGo', function()
     vim.cmd(string.format('term cd "%s" && go run "%s"', filepath, filename))
 end, {})
 
+-- Custom command to run Rust files with terminal interaction in a split window
+vim.api.nvim_create_user_command('RunRust', function()
+    local filepath = vim.fn.expand('%:p:h')          -- Get file directory
+    local filename = vim.fn.expand('%:t')            -- Get current file name
+    local output_name = filename:gsub("%.rs$", "")   -- Remove .rs extension for output file
+
+    -- Close any existing terminal buffer
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.fn.getbufvar(buf, '&buftype') == 'terminal' then
+            vim.api.nvim_buf_delete(buf, { force = true })
+        end
+    end
+
+    -- Check for Cargo.toml to decide between cargo run or rustc
+    local cargo_toml = vim.fn.findfile('Cargo.toml', filepath .. ';')
+
+    vim.cmd('vsplit')   -- Open vertical split
+    vim.cmd('wincmd l') -- Move to the right-side split
+
+    if cargo_toml ~= "" then
+        -- It's a Cargo project
+        local cargo_dir = vim.fn.fnamemodify(cargo_toml, ':h')
+        vim.cmd(string.format('term cd "%s" && cargo run', cargo_dir))
+    else
+        -- It's a standalone Rust file
+        vim.cmd(string.format('term cd "%s" && rustc "%s" -o "%s" && ./"%s"; rm -f "%s"', filepath, filename,
+            output_name, output_name, output_name))
+    end
+end, {})
+
 -- HTML Linter Switching Commands
 vim.api.nvim_create_user_command('HTML5', function()
     vim.g.htmlhint_config = vim.fn.stdpath("config") .. "/linter_configs/html5.json"
