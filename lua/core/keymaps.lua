@@ -76,8 +76,12 @@ vim.keymap.set({ "n", "i" }, "<F2>", function()
     })
     local tmp = os.tmpname()
     -- Pass EMO_EMBED=1 to remove internal margins
-    vim.fn.termopen("EMO_EMBED=1 ~/.local/bin/emo > " .. tmp, {
-        on_exit = function()
+    vim.cmd("terminal EMO_EMBED=1 ~/.local/bin/emo > " .. tmp)
+    vim.bo.bufhidden = "wipe"
+    vim.api.nvim_create_autocmd("TermClose", {
+        buffer = 0,
+        once = true,
+        callback = function()
             if vim.api.nvim_win_is_valid(win) then vim.api.nvim_win_close(win, true) end
             local f = io.open(tmp, "r")
             if f then
