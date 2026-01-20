@@ -49,3 +49,9 @@ vim.keymap.set('n', '<leader>t', function()
         print("\nInvalid input!")
     end
 end, { noremap = true, silent = true, desc = "Go to specific tab number" })
+
+-- Move Lines (VS Code style)
+vim.keymap.set("n", "<C-j>", ":m .+1<CR>==", { desc = "Move line down" })
+vim.keymap.set("n", "<C-k>", ":m .-2<CR>==", { desc = "Move line up" })
+vim.keymap.set("v", "<C-j>", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
+vim.keymap.set("v", "<C-k>", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
