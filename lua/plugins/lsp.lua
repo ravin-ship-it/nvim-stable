@@ -213,6 +213,26 @@ return {
 
             vim.lsp.enable("gopls")
 
+            -- Configure Rust LSP
+            vim.lsp.config.rust_analyzer = {
+                cmd = { "rust-analyzer" },
+                filetypes = { "rust" },
+                root_markers = { "Cargo.toml", "rust-project.json" },
+                capabilities = capabilities,
+                settings = {
+                    ["rust-analyzer"] = {
+                        cargo = {
+                            allFeatures = true,
+                        },
+                        check = {
+                            command = "clippy",
+                        },
+                    },
+                },
+            }
+
+            vim.lsp.enable("rust_analyzer")
+
             -- Configure Java LSP (jdtls)
             vim.api.nvim_create_autocmd("FileType", {
                 pattern = "java",

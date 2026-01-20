@@ -24,7 +24,8 @@ return {
                     "python",
                     "asm", -- Assembly
                     "go",
-                    "cpp"  -- C++
+                    "cpp",  -- C++
+                    "rust"
                 },
                 highlight = { enable = true },
                 -- indent = { enable = true }, -- you can enable this if you want
