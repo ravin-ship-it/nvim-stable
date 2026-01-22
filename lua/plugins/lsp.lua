@@ -227,6 +227,9 @@ return {
                         check = {
                             command = "clippy",
                         },
+                        rustfmt = {
+                            enableRangeFormatting = true,
+                        },
                     },
                 },
             }
@@ -264,7 +267,7 @@ return {
                         vim.api.nvim_create_autocmd("BufWritePre", {
                             buffer = args.buf,
                             callback = function()
-                                vim.lsp.buf.format({ bufnr = args.buf })
+                                vim.lsp.buf.format({ bufnr = args.buf, timeout_ms = 5000 })
                             end,
                         })
                     end
