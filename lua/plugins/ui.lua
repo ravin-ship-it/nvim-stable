@@ -31,7 +31,7 @@ return {
         dependencies = { "kyazdani42/nvim-web-devicons" },
         config = function()
             require("trouble").setup()
-            vim.keymap.set("n", "<leader>xx", ":TroubleToggle<CR>", { noremap = true, silent = true })
+            vim.keymap.set("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { noremap = true, silent = true })
         end
     },
 
