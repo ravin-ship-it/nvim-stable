@@ -39,7 +39,19 @@ return {
     {
         "nvim-tree/nvim-web-devicons",
         lazy = true,
-        opts = { default = true }
+        config = function()
+            require("nvim-web-devicons").setup({
+                override = {
+                    css = {
+                        icon = "",
+                        color = "#4288d0",
+                        cterm_color = "65",
+                        name = "css",
+                    },
+                },
+                default = true,
+            })
+        end
     },
 
     -- Color Scheme
@@ -59,6 +71,10 @@ return {
             vim.cmd("highlight NvimTreeFileName guifg=#FCA7EA")   -- Pink
             vim.cmd("highlight NvimTreeOpenedFolderName guifg=#00FFFF")
             vim.cmd("highlight NvimTreeRootFolder guifg=#FCA7EA")
+
+            -- Customizing Trouble Colors
+            vim.cmd("highlight TroubleNormal guibg=black")
+            vim.cmd("highlight TroubleNormalNC guibg=black")
         end
     },
 }

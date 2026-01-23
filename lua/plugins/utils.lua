@@ -63,7 +63,9 @@ return {
         event = "VeryLazy",
         config = function()
             require("nvim-surround").setup({
-                -- Configuration here, or leave empty to use defaults
+                -- We'll use different keys if needed, but for now disable defaults if they conflict
+                -- Actually, nvim-surround uses 'ys', 'ds', 'cs' in normal mode.
+                -- It uses 'S' in visual mode.
             })
         end
     },
@@ -76,8 +78,8 @@ return {
         opts = {},
         -- stylua: ignore
         keys = {
-            { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
-            { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+            { "s", mode = { "n", "o" }, function() require("flash").jump() end, desc = "Flash" },
+            { "S", mode = { "n", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
             { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
             { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
             { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
@@ -89,6 +91,20 @@ return {
         "folke/todo-comments.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
         opts = {},
+    },
+
+    -- Oil.nvim (Edit file system like a buffer)
+    {
+        "stevearc/oil.nvim",
+        opts = {},
+        config = function()
+            require("oil").setup({
+                view_options = {
+                    show_hidden = true, -- Show dotfiles
+                },
+            })
+            vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+        end,
     },
 
     -- nvim-autopairs setup

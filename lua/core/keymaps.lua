@@ -11,6 +11,7 @@ vim.keymap.set("n", "<leader>fh", ":Telescope help_tags<CR>", { noremap = true, 
 
 -- Keybinding for checking Diagnostic
 vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, { desc = "Show Diagnostics" })
+vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "LSP Code Action" })
 
 -- Color Picker Keymaps
 vim.keymap.set("n", "<leader>cp", ":CccPick<CR>", { noremap = true, silent = true })

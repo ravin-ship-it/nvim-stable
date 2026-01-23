@@ -16,11 +16,7 @@ return {
         config = function()
             -- Enable inline error messages
             vim.diagnostic.config({
-                virtual_text = {
-                    prefix = "●", -- Symbol for inline error messages
-                    spacing = 4,   -- Spacing between error text and line
-                    severity = vim.diagnostic.severity.ERROR, -- Show only errors inline
-                },
+                virtual_text = false, -- Disable ghostly inline error messages
                 float = { border = "rounded" },           -- Floating diagnostics window style
                 signs = true,                             -- Show error signs in gutter
                 underline = true,                         -- Underline errors
