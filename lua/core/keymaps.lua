@@ -27,6 +27,7 @@ vim.api.nvim_set_keymap('n', '<leader>r', ':lua '
     .. 'elseif vim.bo.filetype == "python" then vim.cmd("RunPython") '
     .. 'elseif vim.bo.filetype == "go" then vim.cmd("RunGo") '
     .. 'elseif vim.bo.filetype == "rust" then vim.cmd("RunRust") '
+    .. 'elseif vim.bo.filetype == "zig" then vim.cmd("RunZig") '
     .. 'else print("Not a supported file type") end<CR>',
     { noremap = true, silent = true })
 

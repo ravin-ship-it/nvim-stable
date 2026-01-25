@@ -232,6 +232,26 @@ return {
 
             vim.lsp.enable("rust_analyzer")
 
+            -- Configure Zig LSP (zls)
+            vim.lsp.config.zls = {
+                cmd = { "proot", "-0", "zls" },
+                filetypes = { "zig", "zir" },
+                root_markers = { "zls.json", "build.zig", ".git" },
+                capabilities = capabilities,
+                init_options = {
+                    enable_build_on_save = false,
+                    enable_autofix = false,
+                },
+                settings = {
+                    zls = {
+                        enable_build_on_save = false,
+                        enable_autofix = false,
+                    },
+                },
+            }
+
+            vim.lsp.enable("zls")
+
             -- Configure Java LSP (jdtls)
             vim.api.nvim_create_autocmd("FileType", {
                 pattern = "java",

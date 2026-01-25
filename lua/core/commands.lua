@@ -172,6 +172,34 @@ vim.api.nvim_create_user_command('RunRust', function()
     end
 end, {})
 
+-- Custom command to run Zig files with terminal interaction in a split window
+vim.api.nvim_create_user_command('RunZig', function()
+    local filepath = vim.fn.expand('%:p:h')          -- Get file directory
+    local filename = vim.fn.expand('%:t')            -- Get current file name
+
+    -- Close any existing terminal buffer
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.fn.getbufvar(buf, '&buftype') == 'terminal' then
+            vim.api.nvim_buf_delete(buf, { force = true })
+        end
+    end
+
+    -- Check for build.zig to decide between zig build run or zig run
+    local build_zig = vim.fn.findfile('build.zig', filepath .. ';')
+
+    vim.cmd('vsplit')   -- Open vertical split
+    vim.cmd('wincmd l') -- Move to the right-side split
+
+    if build_zig ~= "" then
+        -- It's a Zig project
+        local project_dir = vim.fn.fnamemodify(build_zig, ':h')
+        vim.cmd(string.format('term cd "%s" && zig build run', project_dir))
+    else
+        -- It's a standalone Zig file
+        vim.cmd(string.format('term cd "%s" && zig run "%s"', filepath, filename))
+    end
+end, {})
+
 -- HTML Linter Switching Commands
 vim.api.nvim_create_user_command('HTML5', function()
     vim.g.htmlhint_config = vim.fn.stdpath("config") .. "/linter_configs/html5.json"
