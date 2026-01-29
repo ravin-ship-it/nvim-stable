@@ -124,7 +124,7 @@ return {
     {
         "numToStr/Comment.nvim",
         config = function()
-            require("Comment").setup()
+            require("Comment").setup({ ignore = '^%s*$' })
 
             -- Import the Comment APIs
             -- Normal Mode: Toggle comments with Ctrl+/
