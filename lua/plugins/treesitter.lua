@@ -28,7 +28,7 @@ return {
                     "rust"
                 },
                 highlight = { enable = true },
-                -- indent = { enable = true }, -- you can enable this if you want
+                indent = { enable = true }, -- you can enable this if you want
             })
         end
     },
