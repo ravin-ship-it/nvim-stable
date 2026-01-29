@@ -113,7 +113,7 @@ return {
         config = function()
             local autopairs = require("nvim-autopairs")
             autopairs.setup({
-                check_ts = true, -- Use TreeSitter for intelligent pairing
+                check_ts = false, -- Disabled to allow nested quotes -- Use TreeSitter for intelligent pairing
                 fast_wrap = {},
                 map_cr = true,   -- Ensure Enter key is mapped correctly
             })

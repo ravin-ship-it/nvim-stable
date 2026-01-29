@@ -25,19 +25,26 @@ return {
                     ["<Up>"] = cmp.mapping.select_prev_item(),
                     ["<Down>"] = cmp.mapping.select_next_item(),
                 },
+                formatting = {
+                    format = function(entry, vim_item)
+                        -- Custom Source Labels
+                        vim_item.menu = ({
+                            nvim_lsp = "[LSP]",
+                            luasnip = "[Snip]",
+                            buffer = "[Buf]",
+                            path = "[Path]",
+                        })[entry.source.name]
+                        return vim_item
+                    end,
+                },
                 sources = cmp.config.sources({
                     {
                         name = "nvim_lsp",
-                        entry_filter = function(entry)
-                            -- Prevent LSP from suggesting files & folders (fixes duplicate path suggestions)
-                            local kind = entry:get_kind()
-                            return kind ~= cmp.lsp.CompletionItemKind.File
-                                and kind ~= cmp.lsp.CompletionItemKind.Folder
-                        end
+                        dup = 0, -- Ignore duplicates
                     },
                     { name = "path" },    -- Ensures correct path suggestions
                     { name = "luasnip" }, -- Snippet completion
-                    { name = "buffer" },  -- Buffer completion (can be removed if unnecessary)
+                    { name = "buffer", keyword_length = 3 },  -- Buffer completion with length limit to reduce noise
                 }),
                 experimental = {
                     ghost_text = true, -- Enables inline preview of suggestions

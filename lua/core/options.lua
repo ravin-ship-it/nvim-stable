@@ -1,5 +1,5 @@
 -- General Settings
-vim.opt.termbidi = true                                   -- Fix for BiDi text (Arabic/Hindi)
+vim.opt.termbidi = true                                   -- Disable BiDi to fix cursor glitches
 vim.g.javascript_indent_disable = 1
 vim.opt.number = true                                     -- Enable absolute line numbers
 vim.opt.relativenumber = false                            -- Enable relative line numbers
@@ -28,5 +28,5 @@ vim.opt.undodir = vim.fn.expand("~/.config/nvim/undodir") -- Specify undo direct
 vim.opt.showmode = false                                  -- Hide mode indicator
 vim.opt.laststatus = 2                                    -- Always show status line
 vim.opt.scrolloff = 8                                     -- Keep 8 lines above/below cursor
-vim.opt.autoread = true                                     -- Automatically reload files changed outside
+vim.opt.autoread = true                                   -- Automatically reload files changed outside
 vim.opt.updatetime = 250

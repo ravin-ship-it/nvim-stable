@@ -62,7 +62,7 @@ return {
 
             -- Background color and highlighting settings
             vim.cmd("highlight Normal guibg=black")
-            vim.cmd("highlight Comment guifg=#808080")
+            vim.cmd("highlight Comment guifg=#808080 gui=none cterm=none") -- Disable italics for comments
             vim.cmd("highlight Function guifg=#88c0d0")
 
             -- Customizing File Tree Colors (nvim-tree)
