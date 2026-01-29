@@ -73,10 +73,20 @@ return {
                         },
                     },
                     css = { validate = true },
-                    javascript = { validate = true },
-                },
+                    javascript = {
+                        validate = true,
+                        suggest = {
+                            completeFunctionCalls = true,
+                            includeCompletionsForModuleExports = true,
+                            includeCompletionsWithObjectLiteralText = true,
+                            includeCompletionsWithClassMemberSnippets = true,
+                        },
+                        format = { enable = true },
+                        implicitProjectConfig = { checkJs = true },
+                    },
             }
 
+            }
             vim.lsp.enable("html")
 
             -- Configure CSS/SCSS/SASS LSP
@@ -118,7 +128,7 @@ return {
             vim.lsp.enable("lua_ls")
 
             -- Configure TypeScript/JavaScript LSP
-            vim.lsp.config.ts_ls = {
+                        vim.lsp.config.ts_ls = {
                 cmd = { "typescript-language-server", "--stdio" },
                 filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "html" },
                 root_markers = { "package.json", "tsconfig.json", "jsconfig.json", ".git" },
@@ -127,8 +137,10 @@ return {
                     javascript = {
                         validate = true,
                         suggest = {
-                            completeFunctionCalls = false,
+                            completeFunctionCalls = true,
                             includeCompletionsForModuleExports = true,
+                            includeCompletionsWithObjectLiteralText = true,
+                            includeCompletionsWithClassMemberSnippets = true,
                         },
                         format = { enable = true },
                         implicitProjectConfig = { checkJs = true },
@@ -136,8 +148,10 @@ return {
                     typescript = {
                         validate = true,
                         suggest = {
-                            completeFunctionCalls = false,
+                            completeFunctionCalls = true,
                             includeCompletionsForModuleExports = true,
+                            includeCompletionsWithObjectLiteralText = true,
+                            includeCompletionsWithClassMemberSnippets = true,
                         },
                         format = { enable = true },
                     },

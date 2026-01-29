@@ -11,6 +11,7 @@ return {
         },
         config = function()
             local cmp = require("cmp")
+            local cmp_autopairs = require("nvim-autopairs.completion.cmp")
 
             cmp.setup({
                 snippet = {
@@ -42,7 +43,7 @@ return {
                         name = "nvim_lsp",
                         dup = 0, -- Ignore duplicates
                     },
-                    { name = "path" },    -- Ensures correct path suggestions
+                    { name = "path", option = { trailing_slash = true } },    -- Ensures correct path suggestions
                     { name = "luasnip" }, -- Snippet completion
                     { name = "buffer", keyword_length = 3 },  -- Buffer completion with length limit to reduce noise
                 }),
@@ -50,6 +51,9 @@ return {
                     ghost_text = true, -- Enables inline preview of suggestions
                 },
             })
+
+            -- Integrate nvim-autopairs with cmp
+            cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
         end,
     },
 
@@ -129,6 +133,76 @@ return {
                 luasnip.s("fa", {
                     luasnip.t(
                         '@import url("https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css");'),
+                }),
+            })
+
+            -- Shebang snippet for Shell
+            luasnip.add_snippets("sh", {
+                luasnip.s("shebang", {
+                    luasnip.t("#!/usr/bin/env bash"),
+                }),
+                luasnip.s("env", {
+                    luasnip.t("#!/usr/bin/env bash"),
+                }),
+            })
+
+            -- Shebang snippet for Python
+            luasnip.add_snippets("python", {
+                luasnip.s("shebang", {
+                    luasnip.t("#!/usr/bin/env python3"),
+                }),
+                luasnip.s("env", {
+                    luasnip.t("#!/usr/bin/env python3"),
+                }),
+            })
+
+            -- Shebang snippet for JavaScript (Node.js)
+            luasnip.add_snippets("javascript", {
+                luasnip.s("shebang", {
+                    luasnip.t("#!/usr/bin/env node"),
+                }),
+                luasnip.s("env", {
+                    luasnip.t("#!/usr/bin/env node"),
+                }),
+            })
+
+            -- Shebang snippet for TypeScript (ts-node)
+            luasnip.add_snippets("typescript", {
+                luasnip.s("shebang", {
+                    luasnip.t("#!/usr/bin/env ts-node"),
+                }),
+                luasnip.s("env", {
+                    luasnip.t("#!/usr/bin/env ts-node"),
+                }),
+            })
+
+            -- Shebang snippet for Lua
+            luasnip.add_snippets("lua", {
+                luasnip.s("shebang", {
+                    luasnip.t("#!/usr/bin/env lua"),
+                }),
+                luasnip.s("env", {
+                    luasnip.t("#!/usr/bin/env lua"),
+                }),
+            })
+
+            -- Shebang snippet for Ruby
+            luasnip.add_snippets("ruby", {
+                luasnip.s("shebang", {
+                    luasnip.t("#!/usr/bin/env ruby"),
+                }),
+                luasnip.s("env", {
+                    luasnip.t("#!/usr/bin/env ruby"),
+                }),
+            })
+
+            -- Shebang snippet for Perl
+            luasnip.add_snippets("perl", {
+                luasnip.s("shebang", {
+                    luasnip.t("#!/usr/bin/env perl"),
+                }),
+                luasnip.s("env", {
+                    luasnip.t("#!/usr/bin/env perl"),
                 }),
             })
 
