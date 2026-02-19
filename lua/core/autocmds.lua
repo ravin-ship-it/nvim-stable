@@ -26,6 +26,16 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
+-- Fix HTML indentation
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "html",
+    callback = function()
+        vim.opt_local.smartindent = false
+        -- The built-in HTML indent script is usually better than Tree-sitter for HTML
+        vim.cmd("runtime! indent/html.vim")
+    end,
+})
+
 -- Autocommand for autosaving feature
 local autosave_enabled = false
 local autosave_timer = nil
