@@ -119,9 +119,6 @@ return {
             vim.keymap.set("t", "<PageUp>", "<C-\\><C-n><PageUp>", { desc = "Scroll Terminal Up" })
             vim.keymap.set("t", "<PageDown>", "<C-\\><C-n><PageDown>", { desc = "Scroll Terminal Down" })
             
-            -- Map <Esc> to exit terminal insert mode (makes it behave like a normal neovim buffer)
-            vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
-            
             -- Map them in normal mode as well so you can continuously scroll once triggered
             vim.keymap.set("n", "<PageUp>", "<C-u>", { desc = "Scroll Window Up" })
             vim.keymap.set("n", "<PageDown>", "<C-d>", { desc = "Scroll Window Down" })
