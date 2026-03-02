@@ -76,8 +76,8 @@ vim.cmd([[
   autocmd BufEnter term://* setlocal bufhidden=hide
   autocmd BufEnter term://* setlocal noswapfile
   autocmd BufEnter term://* setlocal signcolumn=no
-  autocmd BufEnter term://* setlocal scrollback=10000  -- Ensure scrollback is set
-  autocmd BufEnter term://* setlocal mouse=a  -- Enable mouse interactions
+  autocmd BufEnter term://* setlocal scrollback=10000  " Ensure scrollback is set
+  autocmd BufEnter term://* setlocal mouse=a  " Enable mouse interactions
   augroup END
 ]])
 
@@ -88,6 +88,7 @@ vim.api.nvim_create_autocmd('TermOpen', {
         vim.cmd('setlocal norelativenumber nonumber') -- Disable line numbers
         vim.cmd('setlocal scrollback=10000')          -- Ensure scrollback is set
         vim.cmd('setlocal mouse=a')                   -- Enable mouse interactions
+        vim.cmd('startinsert')                        -- Start in insert/terminal mode
     end,
 })
 

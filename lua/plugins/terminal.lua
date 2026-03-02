@@ -75,6 +75,23 @@ return {
                         require("toggleterm").toggle(term_id)
                         return
                     end
+                elseif vim.bo.buftype == "terminal" then
+                    -- If it's a regular :term buffer, close the window or switch buffer
+                    if vim.fn.winnr('$') > 1 then
+                        vim.cmd("hide")
+                    else
+                        -- It's the last window, switch to alternate buffer or create a new one
+                        local prev_buf = vim.fn.bufnr('#')
+                        if prev_buf > 0 and vim.fn.buflisted(prev_buf) == 1 then
+                            vim.cmd("buffer " .. prev_buf)
+                        else
+                            vim.cmd("bprevious")
+                            if vim.bo.buftype == "terminal" then
+                                vim.cmd("enew")
+                            end
+                        end
+                    end
+                    return
                 end
 
                 local file_dir = vim.fn.expand('%:p:h')
@@ -91,11 +108,20 @@ return {
             end
 
             -- Override the <C-t> mapping to open in current file's directory
-            vim.keymap.set("n", "<C-t>", function() toggle_term_in_dir("float") end, { desc = "Toggle terminal in file directory" })
+            vim.keymap.set({ "n", "t" }, "<C-t>", function()
+                -- When in terminal mode, `<C-t>` will now also trigger the toggle function
+                -- If we are in terminal mode, we want to ensure we're interacting with the toggle properly
+                -- We use schedule to avoid issues with closing terminals while in insert mode
+                vim.schedule(function() toggle_term_in_dir("float") end)
+            end, { desc = "Toggle terminal in file directory" })
 
             -- Global terminal mode mappings for scrolling the terminal buffer
             vim.keymap.set("t", "<PageUp>", "<C-\\><C-n><PageUp>", { desc = "Scroll Terminal Up" })
             vim.keymap.set("t", "<PageDown>", "<C-\\><C-n><PageDown>", { desc = "Scroll Terminal Down" })
+            
+            -- Map <Esc> to exit terminal insert mode (makes it behave like a normal neovim buffer)
+            vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+            
             -- Map them in normal mode as well so you can continuously scroll once triggered
             vim.keymap.set("n", "<PageUp>", "<C-u>", { desc = "Scroll Window Up" })
             vim.keymap.set("n", "<PageDown>", "<C-d>", { desc = "Scroll Window Down" })
@@ -104,7 +130,7 @@ return {
             local function set_terminal_keymaps()
                 -- Terminal mode mappings
                 local opts = { buffer = 0 }
-                -- vim.keymap.set('t', '<Esc>', [[<C-\><C-n>]], opts)
+                -- <Esc> is handled globally above now
                 vim.keymap.set('t', '<C-h>', [[<Cmd>wincmd h<CR>]], opts)
                 vim.keymap.set('t', '<C-j>', [[<Cmd>wincmd j<CR>]], opts)
                 vim.keymap.set('t', '<C-k>', [[<Cmd>wincmd k<CR>]], opts)
