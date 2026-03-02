@@ -144,3 +144,11 @@ vim.api.nvim_create_autocmd('FileChangedShellPost', {
         vim.api.nvim_exec_autocmds('BufEnter', { group = nil })
     end,
 })
+
+-- Auto-refresh nvim-tree when entering its window
+vim.api.nvim_create_autocmd("BufEnter", {
+    pattern = "NvimTree*",
+    callback = function()
+        require("nvim-tree.api").tree.reload()
+    end,
+})

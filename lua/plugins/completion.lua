@@ -43,9 +43,10 @@ return {
                         name = "nvim_lsp",
                         dup = 0, -- Ignore duplicates
                     },
-                    { name = "path", option = { trailing_slash = true } },    -- Ensures correct path suggestions
-                    { name = "luasnip" }, -- Snippet completion
-                    { name = "buffer", keyword_length = 3 },  -- Buffer completion with length limit to reduce noise
+                    { name = "luasnip" },
+                }, {
+                    { name = "path", option = { trailing_slash = true } },
+                    { name = "buffer", keyword_length = 3 },
                 }),
                 experimental = {
                     ghost_text = true, -- Enables inline preview of suggestions

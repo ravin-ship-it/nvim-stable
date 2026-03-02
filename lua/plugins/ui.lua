@@ -12,6 +12,10 @@ return {
                 },
                 filters = {
                     dotfiles = false,
+                    custom = { "node_modules", ".git" },
+                },
+                filesystem_watchers = {
+                    enable = false,
                 },
             })
         end
