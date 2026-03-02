@@ -68,6 +68,15 @@ return {
             local next_term_id = 1
 
             local function toggle_term_in_dir(direction)
+                -- If we are currently in a toggleterm buffer, just toggle it to close
+                if vim.bo.filetype == "toggleterm" then
+                    local term_id = vim.b.toggle_number
+                    if term_id then
+                        require("toggleterm").toggle(term_id)
+                        return
+                    end
+                end
+
                 local file_dir = vim.fn.expand('%:p:h')
                 if file_dir == '' then
                     file_dir = vim.fn.getcwd()
@@ -83,6 +92,13 @@ return {
 
             -- Override the <C-t> mapping to open in current file's directory
             vim.keymap.set("n", "<C-t>", function() toggle_term_in_dir("float") end, { desc = "Toggle terminal in file directory" })
+
+            -- Global terminal mode mappings for scrolling the terminal buffer
+            vim.keymap.set("t", "<PageUp>", "<C-\\><C-n><PageUp>", { desc = "Scroll Terminal Up" })
+            vim.keymap.set("t", "<PageDown>", "<C-\\><C-n><PageDown>", { desc = "Scroll Terminal Down" })
+            -- Map them in normal mode as well so you can continuously scroll once triggered
+            vim.keymap.set("n", "<PageUp>", "<C-u>", { desc = "Scroll Window Up" })
+            vim.keymap.set("n", "<PageDown>", "<C-d>", { desc = "Scroll Window Down" })
 
             -- Set up keymaps for regular :term command (not toggleterm)
             local function set_terminal_keymaps()
