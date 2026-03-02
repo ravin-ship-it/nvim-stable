@@ -16,9 +16,12 @@ return {
                 -- Main settings
                 size = function(term)
                     if term.direction == "horizontal" then
-                        return 15
+                        -- Take exactly 50% of the current total lines (height)
+                        return math.floor(vim.o.lines * 0.5)
                     elseif term.direction == "vertical" then
-                        return vim.o.columns * 0.4
+                        -- Take exactly 50% of the current total columns (width)
+                        -- Ensure it calculates based on the full editor width
+                        return math.floor(vim.o.columns * 0.5)
                     end
                 end,
                 open_mapping = [[<C-t>]],
@@ -103,8 +106,16 @@ return {
                     dir_terminals[file_dir] = next_term_id
                     next_term_id = next_term_id + 1
                 end
+
+                -- Calculate exact explicit size on every open to prevent ToggleTerm from using stale cached dimensions
+                local size = nil
+                if direction == "horizontal" then
+                    size = math.floor(vim.o.lines * 0.5)
+                elseif direction == "vertical" then
+                    size = math.floor(vim.o.columns * 0.5)
+                end
                 
-                require("toggleterm").toggle(dir_terminals[file_dir], nil, file_dir, direction)
+                require("toggleterm").toggle(dir_terminals[file_dir], size, file_dir, direction)
             end
 
             -- Override the <C-t> mapping to open in current file's directory
@@ -133,17 +144,6 @@ return {
                 vim.keymap.set('t', '<C-k>', [[<Cmd>wincmd k<CR>]], opts)
                 vim.keymap.set('t', '<C-l>', [[<Cmd>wincmd l<CR>]], opts)
             end
-
-            -- Auto-command to set terminal keymaps when regular terminal opens
-            vim.api.nvim_create_autocmd("TermOpen", {
-                pattern = "term://*",
-                callback = function(ev)
-                    -- Only apply to regular :term, not toggleterm
-                    if string.match(vim.api.nvim_buf_get_name(ev.buf), "toggleterm") == nil then
-                        set_terminal_keymaps()
-                    end
-                end
-            })
 
             -- Normal mode keymaps for toggleterm
             vim.keymap.set("n", "<leader>tf", function() toggle_term_in_dir("float") end, { desc = "ToggleTerm Float" })

@@ -81,16 +81,19 @@ vim.cmd([[
   augroup END
 ]])
 
--- Terminal Mode Lock
-vim.api.nvim_create_autocmd('TermOpen', {
-    pattern = 'term://*',
-    callback = function()
+-- Auto-command to set terminal keymaps when regular terminal opens
+vim.api.nvim_create_autocmd("TermOpen", {
+    pattern = "term://*",
+    callback = function(ev)
         vim.cmd('setlocal norelativenumber nonumber') -- Disable line numbers
         vim.cmd('setlocal scrollback=10000')          -- Ensure scrollback is set
         vim.cmd('setlocal mouse=a')                   -- Enable mouse interactions
         vim.cmd('startinsert')                        -- Start in insert/terminal mode
     end,
 })
+
+-- Terminal Mode Lock (Old duplicate removed, combined above)
+-- vim.api.nvim_create_autocmd('TermOpen', {
 
 -- Prevent extra terminal windows from opening
 vim.cmd([[
@@ -151,5 +154,37 @@ vim.api.nvim_create_autocmd("BufEnter", {
     pattern = "NvimTree*",
     callback = function()
         require("nvim-tree.api").tree.reload()
+    end,
+})
+
+-- Automatically resize splits when the window is resized
+vim.api.nvim_create_autocmd("VimResized", {
+    desc = "Automatically resize splits when terminal is resized",
+    callback = function()
+        local current_tab = vim.fn.tabpagenr()
+        
+        -- ToggleTerm sets winfixwidth/height which prevents resizing. Disable it temporarily.
+        for _, win in ipairs(vim.api.nvim_list_wins()) do
+            vim.wo[win].winfixwidth = false
+            vim.wo[win].winfixheight = false
+        end
+        
+        vim.cmd("tabdo wincmd =")
+        vim.cmd("tabnext " .. current_tab)
+        
+        -- Re-apply winfix settings for toggleterm windows based on their proportions
+        for _, win in ipairs(vim.api.nvim_list_wins()) do
+            local buf = vim.api.nvim_win_get_buf(win)
+            if vim.bo[buf].filetype == "toggleterm" then
+                local width = vim.api.nvim_win_get_width(win)
+                local height = vim.api.nvim_win_get_height(win)
+                -- If it spans full width, it's likely a horizontal split
+                if width >= vim.o.columns - 2 then
+                    vim.wo[win].winfixheight = true
+                else
+                    vim.wo[win].winfixwidth = true
+                end
+            end
+        end
     end,
 })
