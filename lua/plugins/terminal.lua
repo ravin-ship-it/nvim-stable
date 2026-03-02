@@ -64,15 +64,25 @@ return {
                 },
             })
 
-            -- Override the <C-t> mapping to open in current file's directory
-            vim.keymap.set("n", "<C-t>", function()
+            local dir_terminals = {}
+            local next_term_id = 1
+
+            local function toggle_term_in_dir(direction)
                 local file_dir = vim.fn.expand('%:p:h')
-                if file_dir ~= '' then
-                    require("toggleterm").toggle(nil, nil, file_dir, "float")
-                else
-                    require("toggleterm").toggle()
+                if file_dir == '' then
+                    file_dir = vim.fn.getcwd()
                 end
-            end, { desc = "Toggle terminal in file directory" })
+                
+                if not dir_terminals[file_dir] then
+                    dir_terminals[file_dir] = next_term_id
+                    next_term_id = next_term_id + 1
+                end
+                
+                require("toggleterm").toggle(dir_terminals[file_dir], nil, file_dir, direction)
+            end
+
+            -- Override the <C-t> mapping to open in current file's directory
+            vim.keymap.set("n", "<C-t>", function() toggle_term_in_dir("float") end, { desc = "Toggle terminal in file directory" })
 
             -- Set up keymaps for regular :term command (not toggleterm)
             local function set_terminal_keymaps()
@@ -97,10 +107,9 @@ return {
             })
 
             -- Normal mode keymaps for toggleterm
-            vim.keymap.set("n", "<leader>tf", "<cmd>ToggleTerm direction=float<cr>", { desc = "ToggleTerm Float" })
-            vim.keymap.set("n", "<leader>tv", "<cmd>ToggleTerm direction=vertical<cr>", { desc = "ToggleTerm Vertical" })
-            vim.keymap.set("n", "<leader>th", "<cmd>ToggleTerm direction=horizontal<cr>",
-                { desc = "ToggleTerm Horizontal" })
+            vim.keymap.set("n", "<leader>tf", function() toggle_term_in_dir("float") end, { desc = "ToggleTerm Float" })
+            vim.keymap.set("n", "<leader>tv", function() toggle_term_in_dir("vertical") end, { desc = "ToggleTerm Vertical" })
+            vim.keymap.set("n", "<leader>th", function() toggle_term_in_dir("horizontal") end, { desc = "ToggleTerm Horizontal" })
 
             -- Function to open a terminal with a specific command
             function _G.run_command(cmd)
