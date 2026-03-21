@@ -46,7 +46,7 @@ return {
                     { name = "luasnip" },
                 }, {
                     { name = "path", option = { trailing_slash = true } },
-                    { name = "buffer", keyword_length = 3 },
+                    { name = "buffer", keyword_length = 3, option = { get_bufnrs = function() return vim.api.nvim_list_bufs() end } },
                 }),
                 experimental = {
                     ghost_text = true, -- Enables inline preview of suggestions
