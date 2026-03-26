@@ -16,11 +16,11 @@ return {
         config = function()
             -- Enable inline error messages
             vim.diagnostic.config({
-                virtual_text = false, -- Disable ghostly inline error messages
-                float = { border = "rounded" },           -- Floating diagnostics window style
-                signs = true,                             -- Show error signs in gutter
-                underline = true,                         -- Underline errors
-                update_in_insert = false,                 -- Avoid updates while typing
+                virtual_text = false,           -- Disable ghostly inline error messages
+                float = { border = "rounded" }, -- Floating diagnostics window style
+                signs = true,                   -- Show error signs in gutter
+                underline = true,               -- Underline errors
+                update_in_insert = false,       -- Avoid updates while typing
             })
 
             -- Function to setup formatting on save
@@ -84,7 +84,7 @@ return {
                         format = { enable = true },
                         implicitProjectConfig = { checkJs = true },
                     },
-            }
+                }
 
             }
             vim.lsp.enable("html")
@@ -128,7 +128,7 @@ return {
             vim.lsp.enable("lua_ls")
 
             -- Configure TypeScript/JavaScript LSP
-                        vim.lsp.config.ts_ls = {
+            vim.lsp.config.ts_ls = {
                 cmd = { "typescript-language-server", "--stdio" },
                 filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
                 root_markers = { "package.json", "tsconfig.json", "jsconfig.json", ".git" },
@@ -270,6 +270,31 @@ return {
             }
 
             vim.lsp.enable("zls")
+
+            -- Configure Tailwind CSS LSP
+            vim.lsp.config.tailwindcss = {
+                cmd = { "tailwindcss-language-server", "--stdio" },
+                filetypes = { "html", "css", "javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "svelte" },
+                root_markers = { "tailwind.config.js", "tailwind.config.ts", "postcss.config.js", "postcss.config.ts", "package.json", "node_modules", ".git" },
+                capabilities = capabilities,
+                settings = {
+                    tailwindCSS = {
+                        classAttributes = { "class", "className", "classList", "ngClass" },
+                        lint = {
+                            cssConflict = "warning",
+                            invalidApply = "error",
+                            invalidConfigPath = "error",
+                            invalidScreen = "error",
+                            invalidTailwindDirective = "error",
+                            invalidVariant = "error",
+                            recommendedVariantOrder = "warning",
+                        },
+                        validate = true,
+                    },
+                },
+            }
+
+            vim.lsp.enable("tailwindcss")
 
             -- Configure Java LSP (jdtls)
             vim.api.nvim_create_autocmd("FileType", {
