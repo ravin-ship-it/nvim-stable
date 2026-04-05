@@ -24,3 +24,11 @@ if not status_ok then
     -- Silently fail if file not found, or use notify if you prefer debug info
     -- vim.notify("xen.liveserver not found", vim.log.levels.WARN)
 end
+
+-- Ensure syntax highlighting starts immediately for the first buffer
+vim.schedule(function()
+    local buf = vim.api.nvim_get_current_buf()
+    if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].filetype ~= "" then
+        pcall(vim.treesitter.start, buf)
+    end
+end)

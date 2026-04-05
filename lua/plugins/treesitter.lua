@@ -1,38 +1,15 @@
 return {
-    -- Syntax Highlighting
+    -- Syntax Highlighting (Neovim 0.12+ 2026 update)
     {
         "nvim-treesitter/nvim-treesitter",
+        lazy = false,
+        priority = 1000,
         build = ":TSUpdate",
         config = function()
-            require("nvim-treesitter.configs").setup({
-                -- Required fields (new)
-                modules = {},
-                sync_install = false,
-                auto_install = true,
-                ignore_install = {},
-
-                -- Treesitter settings
-                ensure_installed = {
-                    "html",
-                    "css",
-                    "scss",
-                    "javascript",
-                    "typescript",
-                    "java",
-                    "json",
-                    "lua",
-                    "python",
-                    "asm", -- Assembly
-                    "go",
-                    "cpp", -- C++
-                    "rust"
-                },
-                highlight = { enable = true },
-                indent = {
-                    enable = true,
-                    disable = { "html" }
-                }, -- you can enable this if you want
+            -- Note: In the new 'main' branch, setup is on the main module
+            require("nvim-treesitter").setup({
+                install_dir = vim.fn.stdpath("data") .. "/site",
             })
-        end
+        end,
     },
 }

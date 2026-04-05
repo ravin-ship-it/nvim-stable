@@ -1,3 +1,21 @@
+-- Enable Treesitter Highlighting (Neovim 0.12+ 2026 update)
+vim.api.nvim_create_autocmd({ "FileType", "BufReadPost", "BufWinEnter" }, {
+    callback = function(ev)
+        -- Skip if already active
+        if vim.treesitter.highlighter.active[ev.buf] then return end
+
+        -- Don't highlight very large files to avoid lag
+        local max_filesize = 100 * 1024 -- 100 KB
+        local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(ev.buf))
+        if ok and stats and stats.size > max_filesize then
+            return
+        end
+
+        -- Try to start treesitter highlighting
+        pcall(vim.treesitter.start, ev.buf)
+    end,
+})
+
 -- SCSS-specific indentation
 vim.api.nvim_create_autocmd("FileType", {
     pattern = "scss",

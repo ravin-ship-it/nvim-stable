@@ -12,6 +12,7 @@ return {
     -- LSP and diagnostics setup using vim.lsp.config (nvim 0.11+)
     {
         "neovim/nvim-lspconfig",
+        event = { "BufReadPre", "BufNewFile" },
         dependencies = { "hrsh7th/cmp-nvim-lsp" },
         config = function()
             -- Enable inline error messages
