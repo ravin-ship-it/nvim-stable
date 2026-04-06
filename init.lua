@@ -1,5 +1,9 @@
 -- Lazy.nvim Bootstrap
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+
+-- ADDED: Ensure custom treesitter parsers are in the runtimepath for all modules
+vim.opt.runtimepath:prepend(vim.fn.stdpath("data") .. "/site")
+
 ---@diagnostic disable-next-line: undefined-field
 if not vim.uv.fs_stat(lazypath) then
     vim.fn.system({

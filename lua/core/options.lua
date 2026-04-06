@@ -1,4 +1,5 @@
 -- General Settings
+vim.cmd("syntax on")
 vim.opt.termbidi = true                                   -- Disable BiDi to fix cursor glitches
 vim.g.javascript_indent_disable = 1
 vim.opt.number = true                                     -- Enable absolute line numbers
