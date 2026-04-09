@@ -1,6 +1,8 @@
 -- General Settings
 vim.cmd("syntax on")
-vim.opt.termbidi = true                                   -- Disable BiDi to fix cursor glitches
+vim.opt.termbidi = false                                  -- CRITICAL: Disable BiDi to fix split and scrolling glitches
+vim.opt.splitright = true                                 -- Open new vertical splits to the right
+vim.opt.splitbelow = true                                 -- Open new horizontal splits below
 vim.g.javascript_indent_disable = 1
 vim.opt.number = true                                     -- Enable absolute line numbers
 vim.opt.relativenumber = false                            -- Enable relative line numbers

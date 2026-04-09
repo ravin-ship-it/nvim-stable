@@ -1,3 +1,8 @@
+-- Disable Lua Bytecode caching permanently to fix Android/Termux filesystem bugs
+if vim.loader then
+    vim.loader.disable()
+end
+
 -- Lazy.nvim Bootstrap
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 

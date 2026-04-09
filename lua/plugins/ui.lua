@@ -17,6 +17,13 @@ return {
                 filesystem_watchers = {
                     enable = false,
                 },
+                actions = {
+                    open_file = {
+                        window_picker = {
+                            enable = false, -- Prevent opening files in random splits
+                        },
+                    },
+                },
             })
         end
     },
@@ -62,23 +69,35 @@ return {
     {
         "folke/tokyonight.nvim",
         config = function()
+            require("tokyonight").setup({
+                transparent = true,
+                styles = {
+                    sidebars = "transparent",
+                    floats = "transparent",
+                },
+            })
             vim.cmd("colorscheme tokyonight")
 
-            -- Background color and highlighting settings
-            vim.cmd("highlight Normal guibg=black")
+            -- CRITICAL: Fix Termux BCE scrolling tears by using transparent backgrounds.
+            -- This prevents the terminal emulator from incorrectly scrolling colored blocks across splits.
+            vim.cmd("highlight Normal guibg=NONE ctermbg=NONE")
             vim.cmd("highlight Comment guifg=#808080 gui=none cterm=none") -- Disable italics for comments
             vim.cmd("highlight Function guifg=#88c0d0")
 
             -- Customizing File Tree Colors (nvim-tree)
-            vim.cmd("highlight NvimTreeNormal guibg=black")
+            vim.cmd("highlight NvimTreeNormal guibg=NONE ctermbg=NONE")
             vim.cmd("highlight NvimTreeFolderName guifg=#00FFFF") -- Cyan
             vim.cmd("highlight NvimTreeFileName guifg=#FCA7EA")   -- Pink
             vim.cmd("highlight NvimTreeOpenedFolderName guifg=#00FFFF")
             vim.cmd("highlight NvimTreeRootFolder guifg=#FCA7EA")
 
             -- Customizing Trouble Colors
-            vim.cmd("highlight TroubleNormal guibg=black")
-            vim.cmd("highlight TroubleNormalNC guibg=black")
+            vim.cmd("highlight TroubleNormal guibg=NONE ctermbg=NONE")
+            vim.cmd("highlight TroubleNormalNC guibg=NONE ctermbg=NONE")
+
+            -- CRITICAL: Make separators completely transparent to avoid drawing boundaries that tear
+            vim.cmd("highlight WinSeparator guibg=NONE ctermbg=NONE guifg=#4288d0 ctermfg=4")
+            vim.cmd("highlight VertSplit guibg=NONE ctermbg=NONE guifg=#4288d0 ctermfg=4")
         end
     },
 }

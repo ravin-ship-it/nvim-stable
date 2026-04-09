@@ -212,3 +212,11 @@ vim.api.nvim_create_user_command('HTMLL', function()
     vim.cmd('edit!') -- Reload buffer to refresh diagnostics
     print("Switched to Legacy/Loose HTML Validation")
 end, {})
+
+-- Command to clear Neovim and Lazy cache manually
+vim.api.nvim_create_user_command('ClearCache', function()
+    local cache_dir = vim.fn.stdpath("cache") .. "/luac"
+    local lazy_state = vim.fn.stdpath("state") .. "/lazy/state.json"
+    vim.fn.system({"rm", "-rf", cache_dir, lazy_state})
+    vim.notify("Neovim bytecode and Lazy cache cleared! Please restart Neovim.", vim.log.levels.INFO)
+end, { desc = "Clear Neovim bytecode and Lazy cache" })
