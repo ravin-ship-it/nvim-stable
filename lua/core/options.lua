@@ -1,4 +1,8 @@
 -- General Settings
+vim.g.loaded_perl_provider = 0                            -- Disable unused perl provider
+vim.g.loaded_python3_provider = 0                         -- Disable unused python3 provider
+vim.g.loaded_ruby_provider = 0                            -- Disable unused ruby provider
+
 vim.cmd("syntax on")
 vim.opt.termbidi = false                                  -- CRITICAL: Disable BiDi to fix split and scrolling glitches
 vim.opt.splitright = true                                 -- Open new vertical splits to the right
