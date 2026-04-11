@@ -11,7 +11,11 @@ vim.api.nvim_create_autocmd({ "FileType", "BufReadPost", "BufWinEnter" }, {
             return
         end
 
-        -- Try to start treesitter highlighting
+        -- Only start treesitter if the filetype is defined and known
+        local ft = vim.bo[ev.buf].filetype
+        if ft == "" then return end
+
+        -- Try to start treesitter highlighting silently
         pcall(vim.treesitter.start, ev.buf)
     end,
 })
