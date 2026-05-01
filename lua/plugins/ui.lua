@@ -20,7 +20,7 @@ return {
                 actions = {
                     open_file = {
                         window_picker = {
-                            enable = false, -- Prevent opening files in random splits
+                            enable = true, -- Re-enabled to prompt for window selection
                         },
                     },
                 },
@@ -81,11 +81,18 @@ return {
             -- CRITICAL: Fix Termux BCE scrolling tears by using transparent backgrounds.
             -- This prevents the terminal emulator from incorrectly scrolling colored blocks across splits.
             vim.cmd("highlight Normal guibg=NONE ctermbg=NONE")
+            vim.cmd("highlight NormalNC guibg=NONE ctermbg=NONE")
+            vim.cmd("highlight EndOfBuffer guibg=NONE ctermbg=NONE")
+            -- Make CursorLine transparent to prevent BCE tearing when scrolling
+            vim.cmd("highlight CursorLine guibg=NONE ctermbg=NONE")
+            vim.cmd("highlight CursorColumn guibg=NONE ctermbg=NONE")
+            
             vim.cmd("highlight Comment guifg=#808080 gui=none cterm=none") -- Disable italics for comments
             vim.cmd("highlight Function guifg=#88c0d0")
 
             -- Customizing File Tree Colors (nvim-tree)
             vim.cmd("highlight NvimTreeNormal guibg=NONE ctermbg=NONE")
+            vim.cmd("highlight NvimTreeCursorLine guibg=NONE ctermbg=NONE")
             vim.cmd("highlight NvimTreeFolderName guifg=#00FFFF") -- Cyan
             vim.cmd("highlight NvimTreeFileName guifg=#FCA7EA")   -- Pink
             vim.cmd("highlight NvimTreeOpenedFolderName guifg=#00FFFF")
@@ -98,6 +105,13 @@ return {
             -- CRITICAL: Make separators completely transparent to avoid drawing boundaries that tear
             vim.cmd("highlight WinSeparator guibg=NONE ctermbg=NONE guifg=#4288d0 ctermfg=4")
             vim.cmd("highlight VertSplit guibg=NONE ctermbg=NONE guifg=#4288d0 ctermfg=4")
+            vim.cmd("highlight NvimTreeWinSeparator guibg=NONE ctermbg=NONE guifg=#4288d0 ctermfg=4")
+            
+            -- Make sure side columns don't have backgrounds that drag during scrolling
+            vim.cmd("highlight SignColumn guibg=NONE ctermbg=NONE")
+            vim.cmd("highlight FoldColumn guibg=NONE ctermbg=NONE")
+            vim.cmd("highlight StatusLine guibg=NONE ctermbg=NONE")
+            vim.cmd("highlight StatusLineNC guibg=NONE ctermbg=NONE")
         end
     },
 }

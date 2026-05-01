@@ -11,6 +11,10 @@ vim.api.nvim_create_autocmd({ "FileType", "BufReadPost", "BufWinEnter" }, {
             return
         end
 
+        -- Don't attach Treesitter to special UI buffers (like NvimTree) to prevent rendering glitches
+        local bt = vim.bo[ev.buf].buftype
+        if bt ~= "" then return end
+
         -- Only start treesitter if the filetype is defined and known
         local ft = vim.bo[ev.buf].filetype
         if ft == "" then return end

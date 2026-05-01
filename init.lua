@@ -37,7 +37,16 @@ end
 -- Ensure syntax highlighting starts immediately for the first buffer
 vim.schedule(function()
     local buf = vim.api.nvim_get_current_buf()
-    if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].filetype ~= "" then
+    if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].buftype == "" and vim.bo[buf].filetype ~= "" then
         pcall(vim.treesitter.start, buf)
     end
 end)
+
+-- WORKAROUND: Fix Termux split scrolling glitches
+-- Neovim's internal scroll optimization causes screen tearing in Termux when splits are open.
+-- Forcing a full redraw on scroll events bypasses the optimization and prevents corruption.
+vim.api.nvim_create_autocmd("WinScrolled", {
+    callback = function()
+        vim.cmd("redraw!")
+    end,
+})

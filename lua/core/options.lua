@@ -4,7 +4,7 @@ vim.g.loaded_python3_provider = 0                         -- Disable unused pyth
 vim.g.loaded_ruby_provider = 0                            -- Disable unused ruby provider
 
 vim.cmd("syntax on")
-vim.opt.termbidi = false                                  -- CRITICAL: Disable BiDi to fix split and scrolling glitches
+vim.opt.termbidi = true                                   -- CRITICAL: Let Termux handle BiDi to fix split and scrolling glitches
 vim.opt.splitright = true                                 -- Open new vertical splits to the right
 vim.opt.splitbelow = true                                 -- Open new horizontal splits below
 vim.g.javascript_indent_disable = 1
