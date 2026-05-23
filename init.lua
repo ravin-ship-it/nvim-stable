@@ -19,6 +19,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- Load Core Settings
+local utils = require("core.utils")
 require("core.options")
 require("core.keymaps")
 require("core.autocmds")
@@ -45,8 +46,10 @@ end)
 -- WORKAROUND: Fix Termux split scrolling glitches
 -- Neovim's internal scroll optimization causes screen tearing in Termux when splits are open.
 -- Forcing a full redraw on scroll events bypasses the optimization and prevents corruption.
-vim.api.nvim_create_autocmd("WinScrolled", {
-    callback = function()
-        vim.cmd("redraw!")
-    end,
-})
+if utils.is_android then
+    vim.api.nvim_create_autocmd("WinScrolled", {
+        callback = function()
+            vim.cmd("redraw!")
+        end,
+    })
+end

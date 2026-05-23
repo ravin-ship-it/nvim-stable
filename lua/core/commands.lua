@@ -1,3 +1,5 @@
+local utils = require("core.utils")
+
 -- Custom command to run JavaScript and TypeScript files with terminal interaction in a split window
 vim.api.nvim_create_user_command('RunJS', function()
     local filepath = vim.fn.expand('%:p:h') -- Get file directory
@@ -38,8 +40,8 @@ vim.api.nvim_create_user_command('RunJava', function()
     -- Use quotes to handle directory paths with spaces or special characters
     vim.cmd('vsplit')
     vim.cmd('wincmd l')
-    vim.cmd(string.format('term cd "%s" && javac "%s" && java -cp "%s" %s; rm -f "%s.class"', filepath, filename,
-        filepath, class_name, class_name))
+    vim.cmd(string.format('term cd "%s" && javac "%s" && java -cp "%s" %s && %s "%s.class"', filepath, filename,
+        filepath, class_name, utils.shell_rm, class_name))
 end, {})
 
 
@@ -48,6 +50,7 @@ vim.api.nvim_create_user_command('RunCpp', function()
     local filepath = vim.fn.expand('%:p:h')         -- Get file directory
     local filename = vim.fn.expand('%:t')           -- Get current file name
     local output_name = filename:gsub("%.cpp$", "") -- Remove .cpp extension for output file
+    if utils.is_windows then output_name = output_name .. ".exe" end
 
     -- Close any existing terminal buffer
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do
@@ -59,8 +62,8 @@ vim.api.nvim_create_user_command('RunCpp', function()
     -- Open vertical split and run the program
     vim.cmd('vsplit')   -- Open vertical split
     vim.cmd('wincmd l') -- Move to the right-side split
-    vim.cmd(string.format('term cd "%s" && g++ "%s" -o "%s" && ./"%s"; rm -f "%s"', filepath, filename, output_name,
-        output_name, output_name))
+    vim.cmd(string.format('term cd "%s" && g++ "%s" -o "%s" && %s"%s" && %s "%s"', filepath, filename, output_name,
+        utils.shell_exec_prefix, output_name, utils.shell_rm, output_name))
 end, {})
 
 
@@ -69,6 +72,7 @@ vim.api.nvim_create_user_command('RunC', function()
     local filepath = vim.fn.expand('%:p:h')         -- Get file directory
     local filename = vim.fn.expand('%:t')           -- Get current file name
     local output_name = filename:gsub("%.c$", "")   -- Remove .c extension for output file
+    if utils.is_windows then output_name = output_name .. ".exe" end
 
     -- Close any existing terminal buffer
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do
@@ -80,8 +84,8 @@ vim.api.nvim_create_user_command('RunC', function()
     -- Open vertical split and run the program
     vim.cmd('vsplit')   -- Open vertical split
     vim.cmd('wincmd l') -- Move to the right-side split
-    vim.cmd(string.format('term cd "%s" && gcc "%s" -o "%s" && ./"%s"; rm -f "%s"', filepath, filename, output_name,
-        output_name, output_name))
+    vim.cmd(string.format('term cd "%s" && gcc "%s" -o "%s" && %s"%s" && %s "%s"', filepath, filename, output_name,
+        utils.shell_exec_prefix, output_name, utils.shell_rm, output_name))
 end, {})
 
 
@@ -90,6 +94,7 @@ vim.api.nvim_create_user_command('RunAsm', function()
     local filepath = vim.fn.expand('%:p:h')                          -- Get file directory
     local filename = vim.fn.expand('%:t')                            -- Get current file name
     local output_name = filename:gsub("%.asm$", ""):gsub("%.s$", "") -- Remove .asm/.s extension
+    if utils.is_windows then output_name = output_name .. ".exe" end
 
     -- Close any existing terminal buffer
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do
@@ -101,8 +106,15 @@ vim.api.nvim_create_user_command('RunAsm', function()
     -- Open vertical split and run the program
     vim.cmd('vsplit')   -- Open vertical split
     vim.cmd('wincmd l') -- Move to the right-side split
-    vim.cmd(string.format('term cd "%s" && as -o "%s.o" "%s" && ld -o "%s" "%s.o" && ./"%s"; rm -f "%s.o" "%s"',
-        filepath, output_name, filename, output_name, output_name, output_name, output_name, output_name))
+    
+    if utils.is_windows then
+        -- Assuming Windows users might be using something else for ASM, but following the pattern
+        vim.cmd(string.format('term cd "%s" && as -o "%s.o" "%s" && ld -o "%s" "%s.o" && %s"%s" && %s "%s.o" && %s "%s"',
+            filepath, output_name, filename, output_name, output_name, utils.shell_exec_prefix, output_name, utils.shell_rm, output_name, utils.shell_rm, output_name))
+    else
+        vim.cmd(string.format('term cd "%s" && as -o "%s.o" "%s" && ld -o "%s" "%s.o" && ./"%s" && rm -f "%s.o" "%s"',
+            filepath, output_name, filename, output_name, output_name, output_name, output_name, output_name))
+    end
 end, {})
 
 
@@ -110,6 +122,7 @@ end, {})
 vim.api.nvim_create_user_command('RunPython', function()
     local filepath = vim.fn.expand('%:p:h') -- Get file directory
     local filename = vim.fn.expand('%:t')   -- Get current file name
+    local python_cmd = utils.is_windows and "python" or "python3"
 
     -- Close any existing terminal buffer
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do
@@ -121,7 +134,7 @@ vim.api.nvim_create_user_command('RunPython', function()
     -- Open vertical split and run the Python program
     vim.cmd('vsplit')   -- Open vertical split
     vim.cmd('wincmd l') -- Move to the right-side split
-    vim.cmd(string.format('term cd "%s" && python3 "%s"', filepath, filename))
+    vim.cmd(string.format('term cd "%s" && %s "%s"', filepath, python_cmd, filename))
 end, {})
 
 -- Custom command to run Go files with terminal interaction in a split window
@@ -147,6 +160,7 @@ vim.api.nvim_create_user_command('RunRust', function()
     local filepath = vim.fn.expand('%:p:h')          -- Get file directory
     local filename = vim.fn.expand('%:t')            -- Get current file name
     local output_name = filename:gsub("%.rs$", "")   -- Remove .rs extension for output file
+    if utils.is_windows then output_name = output_name .. ".exe" end
 
     -- Close any existing terminal buffer
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do
@@ -167,8 +181,8 @@ vim.api.nvim_create_user_command('RunRust', function()
         vim.cmd(string.format('term cd "%s" && cargo run', cargo_dir))
     else
         -- It's a standalone Rust file
-        vim.cmd(string.format('term cd "%s" && rustc "%s" -o "%s" && ./"%s"; rm -f "%s"', filepath, filename,
-            output_name, output_name, output_name))
+        vim.cmd(string.format('term cd "%s" && rustc "%s" -o "%s" && %s"%s" && %s "%s"', filepath, filename,
+            output_name, utils.shell_exec_prefix, output_name, utils.shell_rm, output_name))
     end
 end, {})
 
@@ -217,6 +231,13 @@ end, {})
 vim.api.nvim_create_user_command('ClearCache', function()
     local cache_dir = vim.fn.stdpath("cache") .. "/luac"
     local lazy_state = vim.fn.stdpath("state") .. "/lazy/state.json"
-    vim.fn.system({"rm", "-rf", cache_dir, lazy_state})
+    
+    if vim.fn.isdirectory(cache_dir) == 1 then
+        vim.fn.delete(cache_dir, "rf")
+    end
+    if vim.fn.filereadable(lazy_state) == 1 then
+        vim.fn.delete(lazy_state)
+    end
+    
     vim.notify("Neovim bytecode and Lazy cache cleared! Please restart Neovim.", vim.log.levels.INFO)
 end, { desc = "Clear Neovim bytecode and Lazy cache" })

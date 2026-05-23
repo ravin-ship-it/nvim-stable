@@ -20,10 +20,11 @@ end
 
 local function get_actual_port(output)
     for line in output:gmatch("[^\r\n]+") do
-        local port = line:match("http://127%.0%.0%.1:(%d+)")
-        if port then
-            return tonumber(port)
-        end
+        local port = line:match("http://[%d%.]+:(%d+)")
+        if port then return tonumber(port) end
+        
+        port = line:match("port (%d+)")
+        if port then return tonumber(port) end
     end
     return nil
 end
@@ -157,6 +158,15 @@ vim.api.nvim_create_user_command("LSR", function(opts)
     local port = tonumber(opts.args) or smart_port_from_filename()
     restart_server(port)
 end, { nargs = "?", desc = "Restart Live Server on given or smart port" })
+
+vim.api.nvim_create_user_command("LSW", function()
+    stop_all_servers()
+end, { desc = "Stopped all Live Servers" })
+
+vim.api.nvim_create_user_command("LSAL", function()
+    list_active_servers()
+end, { desc = "List all Active Live Servers" })
+ port" })
 
 vim.api.nvim_create_user_command("LSW", function()
     stop_all_servers()

@@ -15,7 +15,7 @@ return {
         event = { "BufReadPre", "BufNewFile" },
         dependencies = { "hrsh7th/cmp-nvim-lsp" },
         config = function()
-            -- Enable inline error messages
+            -- Configure inline error messages
             vim.diagnostic.config({
                 virtual_text = false,           -- Disable ghostly inline error messages
                 float = { border = "rounded" }, -- Floating diagnostics window style
@@ -23,19 +23,6 @@ return {
                 underline = true,               -- Underline errors
                 update_in_insert = false,       -- Avoid updates while typing
             })
-
-            -- Function to setup formatting on save
-            ---@diagnostic disable-next-line: unused-function, unused-local
-            local function setup_format_on_save(client, bufnr)
-                if client.server_capabilities.documentFormattingProvider then
-                    vim.api.nvim_create_autocmd("BufWritePre", {
-                        buffer = bufnr,
-                        callback = function()
-                            vim.lsp.buf.format({ bufnr = bufnr })
-                        end,
-                    })
-                end
-            end
 
             -- Common capabilities with snippet support
             local capabilities = vim.lsp.protocol.make_client_capabilities()

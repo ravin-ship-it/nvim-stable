@@ -3,9 +3,13 @@ vim.g.loaded_perl_provider = 0                            -- Disable unused perl
 vim.g.loaded_python3_provider = 0                         -- Disable unused python3 provider
 vim.g.loaded_ruby_provider = 0                            -- Disable unused ruby provider
 
+local utils = require("core.utils")
+
 vim.cmd("syntax on")
-vim.opt.termbidi = true                                   -- CRITICAL: Let Termux handle BiDi to fix split and scrolling glitches
-vim.opt.splitright = true                                 -- Open new vertical splits to the right
+if utils.is_android then
+    vim.opt.termbidi = true -- CRITICAL: Let Termux handle BiDi to fix split and scrolling glitches
+end
+vim.opt.splitright = true -- Open new vertical splits to the right
 vim.opt.splitbelow = true                                 -- Open new horizontal splits below
 vim.g.javascript_indent_disable = 1
 vim.opt.number = true                                     -- Enable absolute line numbers
@@ -31,7 +35,7 @@ vim.opt.completeopt = { "menuone", "noselect" }           -- Customize completio
 vim.opt.wildmenu = true                                   -- Enable command-line completion menu
 vim.opt.wildmode = "longest:full,full"                    -- Command-line completion mode: shell-like
 vim.opt.undofile = true                                   -- Enable persistent undo across sessions
-vim.opt.undodir = vim.fn.expand("~/.config/nvim/undodir") -- Specify undo directory
+vim.opt.undodir = vim.fn.stdpath("config") .. "/undodir" -- Specify undo directory
 vim.opt.showmode = false                                  -- Hide mode indicator
 vim.opt.laststatus = 2                                    -- Always show status line
 vim.opt.scrolloff = 8                                     -- Keep 8 lines above/below cursor
