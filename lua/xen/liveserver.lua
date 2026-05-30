@@ -1,4 +1,5 @@
 local uv = vim.loop
+local utils = require("core.utils")
 local servers = {}
 vim.g.live_server_status = ""
 
@@ -35,12 +36,18 @@ local function start_server(preferred_port)
         return
     end
 
+    local cmd = utils.is_windows and "npx.cmd" or "npx"
+    if vim.fn.executable(cmd) == 0 then
+        echo("Command '" .. cmd .. "' not found. Please install Node.js/npm. 🥲", "ErrorMsg")
+        return
+    end
+
     local stdout = uv.new_pipe(false)
     local stderr = uv.new_pipe(false)
     local actual_port = nil
     local handle
 
-    handle = uv.spawn("npx", {
+    handle = uv.spawn(cmd, {
         args = { "live-server", "--port=" .. preferred_port },
         stdio = { nil, stdout, stderr },
     }, function()
@@ -158,15 +165,6 @@ vim.api.nvim_create_user_command("LSR", function(opts)
     local port = tonumber(opts.args) or smart_port_from_filename()
     restart_server(port)
 end, { nargs = "?", desc = "Restart Live Server on given or smart port" })
-
-vim.api.nvim_create_user_command("LSW", function()
-    stop_all_servers()
-end, { desc = "Stopped all Live Servers" })
-
-vim.api.nvim_create_user_command("LSAL", function()
-    list_active_servers()
-end, { desc = "List all Active Live Servers" })
- port" })
 
 vim.api.nvim_create_user_command("LSW", function()
     stop_all_servers()

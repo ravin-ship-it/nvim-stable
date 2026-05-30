@@ -46,27 +46,32 @@ return {
                 }),
             }
 
+            local sources = {
+                null_ls.builtins.formatting.clang_format.with({
+                    filetypes = { "java" },
+                    extra_args = { "--style={BasedOnStyle:Google,IndentWidth:4,ColumnLimit:0,BreakBeforeBinaryOperators:None}" },
+                }),
+                eslint.with({
+                    diagnostics_format = "[eslint] #{m}\n(#{c})",
+                    condition = function(utils)
+                        return utils.root_has_file({
+                            ".eslintrc",
+                            ".eslintrc.js",
+                            ".eslintrc.cjs",
+                            ".eslintrc.yaml",
+                            ".eslintrc.yml",
+                            ".eslintrc.json",
+                        })
+                    end,
+                }),
+            }
+
+            if vim.fn.executable("htmlhint") == 1 then
+                table.insert(sources, htmlhint)
+            end
+
             null_ls.setup({
-                sources = {
-                    null_ls.builtins.formatting.clang_format.with({
-                        filetypes = { "java" },
-                        extra_args = { "--style={BasedOnStyle:Google,IndentWidth:4,ColumnLimit:0,BreakBeforeBinaryOperators:None}" },
-                    }),
-                    eslint.with({
-                        diagnostics_format = "[eslint] #{m}\n(#{c})",
-                        condition = function(utils)
-                            return utils.root_has_file({
-                                ".eslintrc",
-                                ".eslintrc.js",
-                                ".eslintrc.cjs",
-                                ".eslintrc.yaml",
-                                ".eslintrc.yml",
-                                ".eslintrc.json",
-                            })
-                        end,
-                    }),
-                    htmlhint,
-                },
+                sources = sources,
                 on_attach = function(client, bufnr)
                     if client:supports_method("textDocument/formatting", bufnr) then
                         local group = vim.api.nvim_create_augroup("LspFormatting", { clear = true })
