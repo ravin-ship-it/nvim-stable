@@ -22,7 +22,8 @@ return {
                 method = null_ls.methods.DIAGNOSTICS,
                 filetypes = { "html" },
                 generator = null_ls.generator({
-                    command = "htmlhint",
+                    command = (vim.fn.executable("htmlhint") == 1 and "htmlhint") or
+                        (vim.fn.stdpath("data") .. "/mason/bin/htmlhint"),
                     -- Dynamic args to read from global variable
                     args = function()
                         return { "--format=unix", "--config", vim.g.htmlhint_config, "stdin" }
@@ -66,7 +67,8 @@ return {
                 }),
             }
 
-            if vim.fn.executable("htmlhint") == 1 then
+            if vim.fn.executable("htmlhint") == 1 or
+                vim.fn.executable(vim.fn.stdpath("data") .. "/mason/bin/htmlhint") == 1 then
                 table.insert(sources, htmlhint)
             end
 

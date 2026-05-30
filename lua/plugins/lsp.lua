@@ -13,8 +13,20 @@ return {
     {
         "neovim/nvim-lspconfig",
         event = { "BufReadPre", "BufNewFile" },
-        dependencies = { "hrsh7th/cmp-nvim-lsp" },
+        dependencies = {
+            "hrsh7th/cmp-nvim-lsp",
+            not require("core.utils").is_android and "williamboman/mason-lspconfig.nvim" or nil,
+        },
         config = function()
+            -- Initialize mason-lspconfig to bridge Mason and lspconfig
+            local is_android = require("core.utils").is_android
+            if not is_android then
+                local status_ok, mason_lspconfig = pcall(require, "mason-lspconfig")
+                if status_ok then
+                    mason_lspconfig.setup()
+                end
+            end
+
             -- Configure inline error messages
             vim.diagnostic.config({
                 virtual_text = false,           -- Disable ghostly inline error messages
