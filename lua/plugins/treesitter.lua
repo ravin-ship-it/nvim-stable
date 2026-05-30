@@ -14,10 +14,13 @@ return {
 
             -- The new main branch setup
             -- Use git instead of curl (more stable on PC/Windows)
+            local has_tree_sitter = vim.fn.executable("tree-sitter") == 1
+            
             require("nvim-treesitter").setup({
                 install_dir = parser_install_dir,
                 prefer_git = true,
-                auto_install = true,
+                -- Only auto-install if we have the necessary tools on PC
+                auto_install = utils.is_android or has_tree_sitter,
             })
 
             -- Automatically install common parsers asynchronously
@@ -29,15 +32,22 @@ return {
             }
             
             -- Only add bundled parsers if we have the tree-sitter CLI or if on Android
-            -- On PC, 'vimdoc' often requires the CLI to build, which causes ENOENT
-            if utils.is_android or vim.fn.executable("tree-sitter") == 1 then
+            if utils.is_android or has_tree_sitter then
                 vim.list_extend(parsers, { "c", "lua", "vim", "vimdoc", "query" })
             end
             
-            -- Pcall so it doesn't crash on startup if offline or if tree-sitter CLI is missing
-            pcall(function()
-                require("nvim-treesitter").install(parsers)
-            end)
+            -- CRITICAL: On PC, if tree-sitter CLI is missing, skip the install call 
+            -- to prevent the "ENOENT: tree-sitter" error spam.
+            if utils.is_android or has_tree_sitter then
+                pcall(function()
+                    require("nvim-treesitter").install(parsers)
+                end)
+            else
+                -- Notify the user once that they need the CLI for full functionality on PC
+                vim.schedule(function()
+                    vim.notify("Treesitter: 'tree-sitter' CLI not found. Automatic parser installation disabled on PC.", vim.log.levels.WARN)
+                end)
+            end
         end,
     },
 }
