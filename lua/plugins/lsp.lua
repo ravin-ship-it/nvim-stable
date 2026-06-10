@@ -62,7 +62,12 @@ return {
                 settings = {
                     html = {
                         validate = true,
-                        format = { enable = true, indentWidth = 4, wrapLineLength = 0, contentUnformatted = "code" },
+                        format = {
+                            enable = true,
+                            indentWidth = 4,
+                            wrapLineLength = 0,
+                            contentUnformatted = "pre, code, textarea",
+                        },
                         hover = true,
                         completion = true,
                         autoClosingTags = true,
