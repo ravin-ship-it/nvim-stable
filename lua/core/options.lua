@@ -22,6 +22,35 @@ vim.opt.autoindent = true                                 -- Enable automatic in
 vim.opt.termguicolors = true                              -- Enable true color support
 vim.opt.mouse = "a"                                       -- Enable mouse support
 vim.opt.clipboard = "unnamedplus"                         -- Sync with system clipboard
+
+-- Universal Clipboard Fix (Termux, SSH/Laptop, and Local)
+if utils.is_android then
+    -- Already handled by Neovim's unnamedplus + termux-api if installed,
+    -- but we can explicitly set it to be safe or use OSC 52 if SSH'd into mobile.
+    if vim.env.SSH_TTY then
+        vim.g.clipboard = {
+            name = "OSC 52",
+            copy = { ["+"] = require("vim.ui.clipboard.osc52").copy("+"), ["*"] = require("vim.ui.clipboard.osc52").copy("*") },
+            paste = { ["+"] = require("vim.ui.clipboard.osc52").paste("+"), ["*"] = require("vim.ui.clipboard.osc52").paste("*") },
+        }
+    end
+else
+    -- Laptop / Non-Android environment
+    -- Prefer OSC 52 for SSH sessions, otherwise let Neovim auto-detect (xclip/wl-copy/pbcopy)
+    if vim.env.SSH_TTY or vim.env.SSH_CLIENT then
+        vim.g.clipboard = {
+            name = "OSC 52",
+            copy = { ["+"] = require("vim.ui.clipboard.osc52").copy("+"), ["*"] = require("vim.ui.clipboard.osc52").copy("*") },
+            paste = { ["+"] = require("vim.ui.clipboard.osc52").paste("+"), ["*"] = require("vim.ui.clipboard.osc52").paste("*") },
+        }
+    else
+        -- Local laptop session: Ensure unnamedplus is used (already set above)
+        -- We don't override vim.g.clipboard here so Neovim uses its built-in detection
+        -- for xclip, wl-copy, etc.
+    end
+end
+
+
 vim.opt.fileencoding = "utf-8"                            -- Ensure files are written in UTF-8
 vim.opt.encoding = "utf-8"                                -- Set internal encoding (redundant but explicit)
 vim.opt.textwidth = 0
