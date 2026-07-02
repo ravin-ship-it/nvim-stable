@@ -103,3 +103,20 @@ if utils.is_android then
         vim.cmd("startinsert")
     end, { desc = "Termux Emoji Picker" })
 end
+
+-- Comment Toggle (Ctrl+/ = <C-_> or <C-/> in terminals)
+vim.schedule(function()
+    local api = require('Comment.api')
+    for _, key in ipairs({ '<C-_>', '<C-/>' }) do
+        vim.keymap.set('n', key, api.toggle.linewise.current, { silent = true, desc = 'Comment line' })
+        vim.keymap.set('x', key, function()
+            api.toggle.linewise(vim.fn.visualmode())
+        end, { silent = true, desc = 'Comment selection' })
+        vim.keymap.set('i', key, function()
+            vim.cmd('stopinsert')
+            api.toggle.linewise.current()
+        end, { silent = true, desc = 'Comment line (insert)' })
+    end
+end)
+
+

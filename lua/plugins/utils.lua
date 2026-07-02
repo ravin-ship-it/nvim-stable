@@ -121,35 +121,27 @@ return {
     },
 
     -- Initialize the Comment.nvim plugin
+    -- Keymaps are handled in keymaps.lua via vim.schedule()
     {
         "numToStr/Comment.nvim",
         config = function()
             require("Comment").setup({ ignore = '^%s*$' })
 
-            -- Import the Comment APIs
-            -- Normal Mode: Toggle comments with Ctrl+/
-            vim.api.nvim_set_keymap(
-                "n",
-                "<C-_>", -- Note: <C-_> is often used for Ctrl+/
-                [[<cmd>lua require('Comment.api').toggle.linewise.current()<CR>]],
-                { noremap = true, silent = true }
-            )
+            -- Register bash/zsh in Comment.nvim's filetype table
+            -- (they're not included by default, only 'sh' is)
+            local ft = require('Comment.ft')
+            ft.set('bash', { '# %s' })
+            ft.set('zsh', { '# %s' })
 
-            -- Visual Mode: Toggle comments with Ctrl+/
-            vim.api.nvim_set_keymap(
-                "v",
-                "<C-_>",
-                [[<esc><cmd>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>]],
-                { noremap = true, silent = true }
-            )
-
-            -- Insert Mode: Toggle comments with Ctrl+/ (cursor returns to insert mode)
-            vim.api.nvim_set_keymap(
-                "i",
-                "<C-_>",
-                [[<Esc><cmd>lua require('Comment.api').toggle.linewise.current()<CR>gi]],
-                { noremap = true, silent = true }
-            )
+            -- Fix Comment.nvim bug where it crashes if treesitter parser is nil
+            local old_calculate = ft.calculate
+            ft.calculate = function(ctx)
+                local ok, parser = pcall(vim.treesitter.get_parser, vim.api.nvim_get_current_buf())
+                if not ok or not parser then
+                    return ft.get(vim.bo.filetype, ctx.ctype)
+                end
+                return old_calculate(ctx)
+            end
         end,
     },
 
