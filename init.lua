@@ -1,7 +1,9 @@
--- Disable Lua Bytecode caching permanently to fix Android/Termux filesystem bugs (deprecated)
--- if vim.loader then
---     vim.loader.disable()
--- end
+-- Disable Lua Bytecode caching on Android/Termux to fix stale filesystem cache bugs
+-- (mtimes are unreliable on Android, causing Neovim to load old config states)
+if vim.loader and vim.fn.has("android") == 1 then
+    vim.loader.enable(false)
+end
+
 
 -- Lazy.nvim Bootstrap
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -26,7 +28,15 @@ require("core.autocmds")
 require("core.commands")
 
 -- Load Plugins
-require("lazy").setup("plugins")
+local lazy_opts = {}
+if vim.fn.has("android") == 1 then
+    lazy_opts.performance = {
+        cache = {
+            enabled = false,
+        },
+    }
+end
+require("lazy").setup("plugins", lazy_opts)
 
 -- Load Xen LiveServer (Must be at the bottom)
 local status_ok, _ = pcall(require, "xen.liveserver")

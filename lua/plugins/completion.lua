@@ -53,8 +53,8 @@ return {
                 },
             })
 
-            -- Integrate nvim-autopairs with cmp
-            cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
+            -- Disabled: Remove auto parenthesis on function names completion
+            -- cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
         end,
     },
 

@@ -27,13 +27,26 @@ return {
                 end
             end
 
-            -- Configure inline error messages
+            -- Helper to support single-file mode by falling back to the current file's directory
+            local function make_root_dir(markers)
+                return function(bufnr)
+                    local root = vim.fs.root(bufnr, markers)
+                    if root then return root end
+                    local bufname = vim.api.nvim_buf_get_name(bufnr)
+                    if bufname and bufname ~= "" then
+                        return vim.fs.dirname(bufname)
+                    end
+                    return vim.fn.getcwd()
+                end
+            end
+
+            -- Configure inline error messages (live diagnostics)
             vim.diagnostic.config({
                 virtual_text = false,           -- Disable ghostly inline error messages
                 float = { border = "rounded" }, -- Floating diagnostics window style
                 signs = true,                   -- Show error signs in gutter
                 underline = true,               -- Underline errors
-                update_in_insert = false,       -- Avoid updates while typing
+                update_in_insert = true,        -- Enable live error updating while typing (Insert mode)
             })
 
             -- Common capabilities with snippet support
@@ -49,7 +62,7 @@ return {
             vim.lsp.config.html = {
                 cmd = { "vscode-html-language-server", "--stdio" },
                 filetypes = { "html" },
-                root_markers = { ".git" },
+                root_dir = make_root_dir({ ".git" }),
                 capabilities = capabilities,
                 init_options = {
                     provideFormatter = true,
@@ -81,7 +94,7 @@ return {
                     javascript = {
                         validate = true,
                         suggest = {
-                            completeFunctionCalls = true,
+                            completeFunctionCalls = false,
                             includeCompletionsForModuleExports = true,
                             includeCompletionsWithObjectLiteralText = true,
                             includeCompletionsWithClassMemberSnippets = true,
@@ -98,7 +111,7 @@ return {
             vim.lsp.config.cssls = {
                 cmd = { "vscode-css-language-server", "--stdio" },
                 filetypes = { "css", "scss", "sass" },
-                root_markers = { ".git" },
+                root_dir = make_root_dir({ ".git" }),
                 capabilities = capabilities,
                 settings = {
                     css = { validate = true },
@@ -113,7 +126,7 @@ return {
             vim.lsp.config.lua_ls = {
                 cmd = { "lua-language-server" },
                 filetypes = { "lua" },
-                root_markers = { ".git" },
+                root_dir = make_root_dir({ ".git" }),
                 capabilities = capabilities,
                 settings = {
                     Lua = {
@@ -136,13 +149,13 @@ return {
             vim.lsp.config.ts_ls = {
                 cmd = { "typescript-language-server", "--stdio" },
                 filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
-                root_markers = { "package.json", "tsconfig.json", "jsconfig.json", ".git" },
+                root_dir = make_root_dir({ "package.json", "tsconfig.json", "jsconfig.json", ".git" }),
                 capabilities = capabilities,
                 settings = {
                     javascript = {
                         validate = true,
                         suggest = {
-                            completeFunctionCalls = true,
+                            completeFunctionCalls = false,
                             includeCompletionsForModuleExports = true,
                             includeCompletionsWithObjectLiteralText = true,
                             includeCompletionsWithClassMemberSnippets = true,
@@ -153,7 +166,7 @@ return {
                     typescript = {
                         validate = true,
                         suggest = {
-                            completeFunctionCalls = true,
+                            completeFunctionCalls = false,
                             includeCompletionsForModuleExports = true,
                             includeCompletionsWithObjectLiteralText = true,
                             includeCompletionsWithClassMemberSnippets = true,
@@ -169,7 +182,7 @@ return {
             vim.lsp.config.jsonls = {
                 cmd = { "vscode-json-language-server", "--stdio" },
                 filetypes = { "json", "jsonc" },
-                root_markers = { ".git" },
+                root_dir = make_root_dir({ ".git" }),
                 capabilities = capabilities,
                 settings = {
                     json = {
@@ -189,7 +202,7 @@ return {
             vim.lsp.config.pylsp = {
                 cmd = { "pylsp" },
                 filetypes = { "python" },
-                root_markers = { ".git", "pyproject.toml", "setup.py" },
+                root_dir = make_root_dir({ ".git", "pyproject.toml", "setup.py" }),
                 capabilities = capabilities,
                 settings = {
                     pylsp = {
@@ -208,7 +221,7 @@ return {
             vim.lsp.config.clangd = {
                 cmd = { "clangd", "--background-index" },
                 filetypes = { "c", "cpp", "objc", "objcpp" },
-                root_markers = { ".git", "compile_commands.json" },
+                root_dir = make_root_dir({ ".git", "compile_commands.json" }),
                 capabilities = capabilities,
             }
 
@@ -218,7 +231,7 @@ return {
             vim.lsp.config.gopls = {
                 cmd = { "gopls" },
                 filetypes = { "go", "gomod", "gowork", "gotmpl" },
-                root_markers = { "go.mod", ".git" },
+                root_dir = make_root_dir({ "go.mod", ".git" }),
                 capabilities = capabilities,
                 settings = {
                     gopls = {
@@ -237,7 +250,7 @@ return {
             vim.lsp.config.rust_analyzer = {
                 cmd = { "rust-analyzer" },
                 filetypes = { "rust" },
-                root_markers = { "Cargo.toml", "rust-project.json" },
+                root_dir = make_root_dir({ "Cargo.toml", "rust-project.json" }),
                 capabilities = capabilities,
                 settings = {
                     ["rust-analyzer"] = {
@@ -260,7 +273,7 @@ return {
             vim.lsp.config.zls = {
                 cmd = { "proot", "-0", "zls" },
                 filetypes = { "zig", "zir" },
-                root_markers = { "zls.json", "build.zig", ".git" },
+                root_dir = make_root_dir({ "zls.json", "build.zig", ".git" }),
                 capabilities = capabilities,
                 init_options = {
                     enable_build_on_save = false,
@@ -277,10 +290,15 @@ return {
             vim.lsp.enable("zls")
 
             -- Configure Tailwind CSS LSP
+            local tailwind_cmd = { "tailwindcss-language-server", "--stdio" }
+            if is_android then
+                tailwind_cmd = { "node", "/data/data/com.termux/files/usr/bin/tailwindcss-language-server", "--stdio" }
+            end
+
             vim.lsp.config.tailwindcss = {
-                cmd = { "tailwindcss-language-server", "--stdio" },
+                cmd = tailwind_cmd,
                 filetypes = { "html", "css", "javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "svelte" },
-                root_markers = { "tailwind.config.js", "tailwind.config.ts", "postcss.config.js", "postcss.config.ts", "package.json", "node_modules", ".git" },
+                root_dir = make_root_dir({ "tailwind.config.js", "tailwind.config.ts", "postcss.config.js", "postcss.config.ts", "package.json", "node_modules", ".git" }),
                 capabilities = capabilities,
                 settings = {
                     tailwindCSS = {
@@ -332,7 +350,7 @@ return {
                         vim.api.nvim_create_autocmd("BufWritePre", {
                             buffer = args.buf,
                             callback = function()
-                                vim.lsp.buf.format({ bufnr = args.buf, timeout_ms = 5000 })
+                                require("core.utils").smart_format({ bufnr = args.buf, timeout_ms = 5000 })
                             end,
                         })
                     end

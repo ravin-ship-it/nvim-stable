@@ -82,7 +82,7 @@ return {
                             group = group,
                             buffer = bufnr,
                             callback = function()
-                                vim.lsp.buf.format({ async = false })
+                                require("core.utils").smart_format({ bufnr = bufnr, async = false })
                             end,
                         })
                     end
