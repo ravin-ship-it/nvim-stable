@@ -8,6 +8,7 @@ return {
             "hrsh7th/cmp-path",
             "hrsh7th/cmp-nvim-lua",
             "saadparwaiz1/cmp_luasnip",
+            "SergioRibera/cmp-dotenv",
         },
         config = function()
             local cmp = require("cmp")
@@ -44,6 +45,7 @@ return {
                         dup = 0, -- Ignore duplicates
                     },
                     { name = "luasnip" },
+                    { name = "dotenv" },
                 }, {
                     { name = "path", option = { trailing_slash = true } },
                     { name = "buffer", keyword_length = 3, option = { get_bufnrs = function() return vim.api.nvim_list_bufs() end } },
