@@ -5,7 +5,7 @@ vim.g.loaded_ruby_provider = 0                            -- Disable unused ruby
 
 local utils = require("core.utils")
 
-vim.cmd("syntax on")
+-- NOTE: Legacy 'syntax on' removed — Treesitter handles all highlighting
 if utils.is_android then
     vim.opt.termbidi = true -- CRITICAL: Let Termux handle BiDi to fix split and scrolling glitches
 end
@@ -23,10 +23,10 @@ vim.opt.termguicolors = true                              -- Enable true color s
 vim.opt.mouse = "a"                                       -- Enable mouse support
 vim.opt.clipboard = "unnamedplus"                         -- Sync with system clipboard
 vim.opt.fileencoding = "utf-8"                            -- Ensure files are written in UTF-8
-vim.opt.encoding = "utf-8"                                -- Set internal encoding (redundant but explicit)
+-- NOTE: vim.opt.encoding removed — Neovim hardcodes UTF-8 internally
 vim.opt.textwidth = 0
 vim.opt.wrap = false                                      -- Disable wrapping completely
-vim.opt.cursorline = false                                -- Highlight the current line
+vim.opt.cursorline = false                                -- Disable cursor line highlight
 vim.opt.incsearch = true                                  -- Show search matches as you type
 vim.opt.hlsearch = true                                   -- Highlight all search results
 vim.opt.ignorecase = true                                 -- Ignore case during searches
@@ -35,9 +35,9 @@ vim.opt.completeopt = { "menuone", "noselect" }           -- Customize completio
 vim.opt.wildmenu = true                                   -- Enable command-line completion menu
 vim.opt.wildmode = "longest:full,full"                    -- Command-line completion mode: shell-like
 vim.opt.undofile = true                                   -- Enable persistent undo across sessions
-vim.opt.undodir = vim.fn.stdpath("config") .. "/undodir" -- Specify undo directory
+vim.opt.undodir = vim.fn.stdpath("state") .. "/undo"     -- Undo files in state dir (not config)
 vim.opt.showmode = false                                  -- Hide mode indicator
 vim.opt.laststatus = 2                                    -- Always show status line
 vim.opt.scrolloff = 8                                     -- Keep 8 lines above/below cursor
 vim.opt.autoread = false                                  -- Disable automatic reload to save watches
-vim.opt.updatetime = 500
+vim.opt.updatetime = 250                                  -- Snappier CursorHold / gitsigns / diagnostics

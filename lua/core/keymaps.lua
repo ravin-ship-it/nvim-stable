@@ -17,19 +17,21 @@ vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "LSP Code Ac
 vim.keymap.set("n", "<leader>cp", ":CccPick<CR>", { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>ch", ":CccHighlighterToggle<CR>", { noremap = true, silent = true })
 
--- Run Command Keybinding
-vim.api.nvim_set_keymap('n', '<leader>r', ':lua '
-    .. 'if vim.bo.filetype == "java" then vim.cmd("RunJava") '
-    .. 'elseif vim.bo.filetype == "javascript" or vim.bo.filetype == "typescript" then vim.cmd("RunJS") '
-    .. 'elseif vim.bo.filetype == "c" then vim.cmd("RunC") '
-    .. 'elseif vim.bo.filetype == "cpp" then vim.cmd("RunCpp") '
-    .. 'elseif vim.bo.filetype == "asm" or vim.bo.filetype == "s" then vim.cmd("RunAsm") '
-    .. 'elseif vim.bo.filetype == "python" then vim.cmd("RunPython") '
-    .. 'elseif vim.bo.filetype == "go" then vim.cmd("RunGo") '
-    .. 'elseif vim.bo.filetype == "rust" then vim.cmd("RunRust") '
-    .. 'elseif vim.bo.filetype == "zig" then vim.cmd("RunZig") '
-    .. 'else print("Not a supported file type") end<CR>',
-    { noremap = true, silent = true })
+-- Run Command Keybinding (filetype dispatch)
+local run_commands = {
+    java = "RunJava", javascript = "RunJS", typescript = "RunJS",
+    c = "RunC", cpp = "RunCpp", asm = "RunAsm", s = "RunAsm",
+    python = "RunPython", go = "RunGo", rust = "RunRust", zig = "RunZig",
+}
+vim.keymap.set("n", "<leader>r", function()
+    local cmd = run_commands[vim.bo.filetype]
+    if cmd then
+        vim.cmd(cmd)
+    else
+        vim.notify("Not a supported file type: " .. vim.bo.filetype, vim.log.levels.WARN)
+    end
+end, { silent = true, desc = "Run current file" })
+
 
 -- Tab Navigation Shortcuts
 for i = 1, 9 do

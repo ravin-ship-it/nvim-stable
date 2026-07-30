@@ -27,6 +27,7 @@ return {
             -- Note: 'vimdoc', 'vim', 'lua', 'c', and 'query' are bundled with Neovim 0.10+
             local parsers = { 
                 "bash", "cpp", "rust", "go", "javascript", "typescript", 
+                "tsx", "jsdoc",
                 "html", "css", "scss", "json", "yaml", "markdown", 
                 "markdown_inline", "python"
             }

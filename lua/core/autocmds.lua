@@ -1,5 +1,13 @@
--- Enable Treesitter Highlighting (Neovim 0.12+ 2026 update)
-vim.api.nvim_create_autocmd({ "FileType", "BufReadPost", "BufWinEnter" }, {
+-- ============================================================================
+-- Autocommands (organized with augroups for clean re-sourcing)
+-- ============================================================================
+
+local augroup = vim.api.nvim_create_augroup
+local autocmd = vim.api.nvim_create_autocmd
+
+-- Enable Treesitter Highlighting (Neovim 0.12+)
+autocmd("FileType", {
+    group = augroup("TreesitterHighlight", { clear = true }),
     callback = function(ev)
         -- Skip if already active
         if vim.treesitter.highlighter.active[ev.buf] then return end
@@ -11,11 +19,11 @@ vim.api.nvim_create_autocmd({ "FileType", "BufReadPost", "BufWinEnter" }, {
             return
         end
 
-        -- Don't attach Treesitter to special UI buffers (like NvimTree) to prevent rendering glitches
+        -- Don't attach Treesitter to special UI buffers (like NvimTree)
         local bt = vim.bo[ev.buf].buftype
         if bt ~= "" then return end
 
-        -- Only start treesitter if the filetype is defined and known
+        -- Only start treesitter if the filetype is defined
         local ft = vim.bo[ev.buf].filetype
         if ft == "" then return end
 
@@ -24,9 +32,10 @@ vim.api.nvim_create_autocmd({ "FileType", "BufReadPost", "BufWinEnter" }, {
     end,
 })
 
--- SCSS-specific indentation
-vim.api.nvim_create_autocmd("FileType", {
-    pattern = "scss",
+-- SCSS/SASS-specific indentation (consolidated from two separate autocmds)
+autocmd("FileType", {
+    group = augroup("SassIndent", { clear = true }),
+    pattern = { "scss", "sass" },
     callback = function()
         vim.opt_local.tabstop = 4
         vim.opt_local.shiftwidth = 4
@@ -34,26 +43,18 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
--- SASS-specific indentation
-vim.api.nvim_create_autocmd("FileType", {
-    pattern = "sass",
-    callback = function()
-        vim.opt_local.tabstop = 4
-        vim.opt_local.shiftwidth = 4
-        vim.opt_local.softtabstop = 4
-    end,
-})
-
--- Autocommand for resetting HTML filetype from htmlangular to html
-vim.api.nvim_create_autocmd("FileType", {
+-- Reset htmlangular filetype to html
+autocmd("FileType", {
+    group = augroup("HtmlAngularFix", { clear = true }),
     pattern = "htmlangular",
     callback = function()
-        vim.cmd("set filetype=html")
+        vim.bo.filetype = "html"
     end,
 })
 
 -- Fix HTML indentation
-vim.api.nvim_create_autocmd("FileType", {
+autocmd("FileType", {
+    group = augroup("HtmlIndentFix", { clear = true }),
     pattern = "html",
     callback = function()
         vim.opt_local.smartindent = false
@@ -62,7 +63,9 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
--- Autocommand for autosaving feature
+-- ============================================================================
+-- Autosave Feature
+-- ============================================================================
 local autosave_enabled = false
 local autosave_timer = nil
 
@@ -77,16 +80,19 @@ local function start_autosave_timer()
     end
 
     autosave_timer = vim.fn.timer_start(1000, function()
-        if autosave_enabled and vim.bo.modified and vim.fn.expand("%") ~= "" then
-            vim.cmd("write") -- Save file (and trigger format on save if you configured it)
-            vim.schedule(function()
+        -- CRITICAL: vim.cmd must be inside vim.schedule when called from a timer callback.
+        -- Without this, vim.cmd("write") crashes with E565 or causes random corruption.
+        vim.schedule(function()
+            if autosave_enabled and vim.bo.modified and vim.fn.expand("%") ~= "" then
+                vim.cmd("write")
                 vim.notify("File saved successfully", vim.log.levels.INFO, { title = "AutoSave" })
-            end)
-        end
+            end
+        end)
     end)
 end
 
-vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
+autocmd({ "TextChanged", "TextChangedI" }, {
+    group = augroup("AutoSave", { clear = true }),
     callback = function()
         if autosave_enabled then
             start_autosave_timer()
@@ -94,70 +100,42 @@ vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
     end,
 })
 
--- Fix for terminal buffer settings
-vim.cmd([[
-  augroup TerminalBufferSettings
-  autocmd!
-  autocmd BufEnter term://* setlocal nonumber norelativenumber
-  autocmd BufEnter term://* setlocal bufhidden=hide
-  autocmd BufEnter term://* setlocal noswapfile
-  autocmd BufEnter term://* setlocal signcolumn=no
-  autocmd BufEnter term://* setlocal scrollback=10000  " Ensure scrollback is set
-  autocmd BufEnter term://* setlocal mouse=a  " Enable mouse interactions
-  augroup END
-]])
-
--- Auto-command to set terminal keymaps when regular terminal opens
-vim.api.nvim_create_autocmd("TermOpen", {
-    pattern = "term://*",
-    callback = function(ev)
-        vim.cmd('setlocal norelativenumber nonumber') -- Disable line numbers
-        vim.cmd('setlocal scrollback=10000')          -- Ensure scrollback is set
-        vim.cmd('setlocal mouse=a')                   -- Enable mouse interactions
-        vim.cmd('startinsert')                        -- Start in insert/terminal mode
-    end,
-})
-
--- Terminal Mode Lock (Old duplicate removed, combined above)
--- vim.api.nvim_create_autocmd('TermOpen', {
-
--- Prevent extra terminal windows from opening
-vim.cmd([[
-  autocmd WinEnter * if &buftype == 'terminal' | setlocal norelativenumber | endif
-]])
-
--- Ensure terminal buffers are not affected by file tree expansion
-vim.cmd([[
-  autocmd WinEnter term://* setlocal noswapfile
-  autocmd WinEnter term://* setlocal bufhidden=hide
-]])
-
--- Close terminal when switching to another buffer
-vim.api.nvim_create_autocmd('BufEnter', {
+-- ============================================================================
+-- Terminal Settings (single source of truth — replaces 3 duplicate blocks)
+-- ============================================================================
+autocmd("TermOpen", {
+    group = augroup("TerminalSettings", { clear = true }),
     callback = function()
-        local current_buf = vim.api.nvim_get_current_buf()
-        local buf_type = vim.bo[current_buf].buftype
-        if buf_type ~= 'terminal' then
-            for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-                if vim.fn.getbufvar(buf, '&buftype') == 'terminal' then
-                    vim.api.nvim_buf_delete(buf, { force = true }) -- Close terminal buffer
-                end
-            end
-        end
+        vim.opt_local.number = false
+        vim.opt_local.relativenumber = false
+        vim.opt_local.signcolumn = "no"
+        vim.opt_local.scrollback = 10000
+        vim.bo.bufhidden = "hide"
+        vim.bo.swapfile = false
+        vim.cmd("startinsert")
     end,
 })
+
+-- NOTE: The old BufEnter autocmd that force-killed ALL terminal buffers whenever
+-- you switched to a non-terminal buffer has been REMOVED. That was destroying
+-- running processes, dev servers, and shell sessions on every buffer switch.
+
+-- ============================================================================
+-- General Autocmds
+-- ============================================================================
 
 -- Highlight on Yank
-vim.api.nvim_create_autocmd('TextYankPost', {
-    desc = 'Highlight when yanking (copying) text',
-    group = vim.api.nvim_create_augroup('highlight-yank', { clear = true }),
+autocmd("TextYankPost", {
+    desc = "Highlight when yanking (copying) text",
+    group = augroup("HighlightYank", { clear = true }),
     callback = function()
         vim.highlight.on_yank()
     end,
 })
 
 -- Auto-reload files when changed outside
-vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+    group = augroup("AutoReload", { clear = true }),
     callback = function()
         if vim.fn.getcmdwintype() == "" then
             vim.cmd("checktime")
@@ -165,46 +143,38 @@ vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHo
     end,
 })
 
--- Force refresh plugins after external file change
-vim.api.nvim_create_autocmd('FileChangedShellPost', {
-    pattern = '*',
+-- Force refresh after external file change
+-- NOTE: Removed nvim_exec_autocmds('BufEnter') cascade that triggered ALL BufEnter
+-- handlers (including the old terminal-killing one) — just redraw is sufficient.
+autocmd("FileChangedShellPost", {
+    group = augroup("FileChangeRefresh", { clear = true }),
+    pattern = "*",
     callback = function()
-        vim.cmd('redraw!')
-        -- Trigger BufEnter again to wake up plugins like ccc
-        vim.api.nvim_exec_autocmds('BufEnter', { group = nil })
-    end,
-})
-
--- Auto-refresh nvim-tree when entering its window
-vim.api.nvim_create_autocmd("BufEnter", {
-    pattern = "NvimTree*",
-    callback = function()
-        require("nvim-tree.api").tree.reload()
+        vim.cmd("redraw!")
     end,
 })
 
 -- Automatically resize splits when the window is resized
-vim.api.nvim_create_autocmd("VimResized", {
+autocmd("VimResized", {
+    group = augroup("AutoResize", { clear = true }),
     desc = "Automatically resize splits when terminal is resized",
     callback = function()
         local current_tab = vim.fn.tabpagenr()
-        
-        -- ToggleTerm sets winfixwidth/height which prevents resizing. Disable it temporarily.
+
+        -- ToggleTerm sets winfixwidth/height which prevents resizing. Disable temporarily.
         for _, win in ipairs(vim.api.nvim_list_wins()) do
             vim.wo[win].winfixwidth = false
             vim.wo[win].winfixheight = false
         end
-        
+
         vim.cmd("tabdo wincmd =")
         vim.cmd("tabnext " .. current_tab)
-        
-        -- Re-apply winfix settings for toggleterm windows based on their proportions
+
+        -- Re-apply winfix settings for toggleterm windows
         for _, win in ipairs(vim.api.nvim_list_wins()) do
             local buf = vim.api.nvim_win_get_buf(win)
             if vim.bo[buf].filetype == "toggleterm" then
                 local width = vim.api.nvim_win_get_width(win)
-                local height = vim.api.nvim_win_get_height(win)
-                -- If it spans full width, it's likely a horizontal split
                 if width >= vim.o.columns - 2 then
                     vim.wo[win].winfixheight = true
                 else

@@ -74,19 +74,8 @@ return {
 
             null_ls.setup({
                 sources = sources,
-                on_attach = function(client, bufnr)
-                    if client:supports_method("textDocument/formatting", bufnr) then
-                        local group = vim.api.nvim_create_augroup("LspFormatting", { clear = true })
-                        vim.api.nvim_clear_autocmds({ group = group, buffer = bufnr })
-                        vim.api.nvim_create_autocmd("BufWritePre", {
-                            group = group,
-                            buffer = bufnr,
-                            callback = function()
-                                vim.lsp.buf.format({ async = false })
-                            end,
-                        })
-                    end
-                end,
+                -- NOTE: Format-on-save is handled globally by LspAttach in lsp.lua
+                -- This covers ALL LSP clients (jsonls, cssls, etc.), not just none-ls.
             })
         end,
     },

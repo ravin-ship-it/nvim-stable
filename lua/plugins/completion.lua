@@ -6,15 +6,18 @@ return {
             "hrsh7th/cmp-nvim-lsp",
             "hrsh7th/cmp-buffer",
             "hrsh7th/cmp-path",
-            "hrsh7th/cmp-nvim-lua",
             "saadparwaiz1/cmp_luasnip",
-            "SergioRibera/cmp-dotenv",
         },
         config = function()
             local cmp = require("cmp")
             local cmp_autopairs = require("nvim-autopairs.completion.cmp")
 
             cmp.setup({
+                performance = {
+                    debounce = 30,
+                    throttle = 30,
+                    fetching_timeout = 500,
+                },
                 snippet = {
                     expand = function(args)
                         require("luasnip").lsp_expand(args.body)
@@ -40,19 +43,55 @@ return {
                     end,
                 },
                 sources = cmp.config.sources({
-                    {
-                        name = "nvim_lsp",
-                        dup = 0, -- Ignore duplicates
-                    },
-                    { name = "luasnip" },
-                    { name = "dotenv" },
+                    { name = "nvim_lsp", max_item_count = 20, priority = 1000 },
+                    { name = "luasnip", max_item_count = 5, priority = 750, keyword_length = 2 },
                 }, {
-                    { name = "path", option = { trailing_slash = true } },
-                    { name = "buffer", keyword_length = 3, option = { get_bufnrs = function() return vim.api.nvim_list_bufs() end } },
+                    { name = "path", option = { trailing_slash = true }, max_item_count = 8 },
+                    {
+                        name = "buffer",
+                        keyword_length = 4,
+                        max_item_count = 8,
+                        option = {
+                            get_bufnrs = function()
+                                return { vim.api.nvim_get_current_buf() }
+                            end,
+                        },
+                    },
                 }),
-                experimental = {
-                    ghost_text = true, -- Enables inline preview of suggestions
+                sorting = {
+                    priority_weight = 2,
+                    comparators = {
+                        cmp.config.compare.exact,
+                        cmp.config.compare.score,
+                        cmp.config.compare.recently_used,
+                        cmp.config.compare.locality,
+                        cmp.config.compare.kind,
+                        cmp.config.compare.length,
+                        cmp.config.compare.order,
+                    },
                 },
+                experimental = {
+                    ghost_text = false,
+                },
+            })
+
+            -- JS/TS/React: LSP-only completions (ts_ls handles imports, paths, everything)
+            cmp.setup.filetype({ "javascript", "javascriptreact", "typescript", "typescriptreact" }, {
+                sources = cmp.config.sources({
+                    { name = "nvim_lsp", max_item_count = 20, priority = 1000 },
+                    { name = "luasnip", max_item_count = 3, priority = 500, keyword_length = 3 },
+                }, {
+                    {
+                        name = "buffer",
+                        keyword_length = 5,
+                        max_item_count = 5,
+                        option = {
+                            get_bufnrs = function()
+                                return { vim.api.nvim_get_current_buf() }
+                            end,
+                        },
+                    },
+                }),
             })
 
             -- Integrate nvim-autopairs with cmp
@@ -73,9 +112,9 @@ return {
 
             -- Configure LuaSnip settings
             luasnip.config.set_config({
-                history = true,                            -- Enable snippet history
-                updateevents = "TextChanged,TextChangedI", -- Update on text changes
-                enable_autosnippets = true,                -- Enable autosnippets
+                history = false,                           -- Disable snippet history (prevents stale expansions)
+                updateevents = "TextChanged",              -- Only update on TextChanged, NOT TextChangedI (lag killer)
+                enable_autosnippets = false,               -- Disable auto-triggering snippets
                 ext_opts = {
                     [types.choiceNode] = {
                         active = { virt_text = { { "●", "Error" } } },
@@ -89,11 +128,14 @@ return {
             -- Lazy-load snippets from friendly-snippets
             require("luasnip.loaders.from_vscode").lazy_load()
 
-            -- Prevent Invalid 'end_row' errors
+            -- Prevent Invalid 'end_row' errors by cleaning up snippet session on leave
             vim.api.nvim_create_autocmd("InsertLeave", {
                 pattern = "*",
                 callback = function()
-                    require("luasnip").unlink_current()
+                    local luasnip_ok, ls = pcall(require, "luasnip")
+                    if luasnip_ok and ls.session and ls.session.current_nodes[vim.api.nvim_get_current_buf()] then
+                        ls.unlink_current()
+                    end
                 end,
             })
 

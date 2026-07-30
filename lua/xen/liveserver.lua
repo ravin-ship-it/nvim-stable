@@ -1,4 +1,4 @@
-local uv = vim.loop
+local uv = vim.uv
 local utils = require("core.utils")
 local servers = {}
 vim.g.live_server_status = ""

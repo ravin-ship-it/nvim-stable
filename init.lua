@@ -6,8 +6,6 @@
 -- Lazy.nvim Bootstrap
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 
--- ADDED: Ensure custom treesitter parsers are in the runtimepath for all modules
-vim.opt.runtimepath:prepend(vim.fn.stdpath("data") .. "/site")
 
 ---@diagnostic disable-next-line: undefined-field
 if not vim.uv.fs_stat(lazypath) then
@@ -35,13 +33,6 @@ if not status_ok then
     -- vim.notify("xen.liveserver not found", vim.log.levels.WARN)
 end
 
--- Ensure syntax highlighting starts immediately for the first buffer
-vim.schedule(function()
-    local buf = vim.api.nvim_get_current_buf()
-    if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].buftype == "" and vim.bo[buf].filetype ~= "" then
-        pcall(vim.treesitter.start, buf)
-    end
-end)
 
 -- WORKAROUND: Fix Termux split scrolling glitches
 -- Neovim's internal scroll optimization causes screen tearing in Termux when splits are open.

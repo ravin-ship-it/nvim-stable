@@ -65,8 +65,9 @@ return {
                         format = {
                             enable = true,
                             indentWidth = 4,
-                            wrapLineLength = 0,
-                            contentUnformatted = "pre, code, textarea",
+                            wrapLineLength = 999999, -- large number effectively disables wrapping
+                            wrapAttributes = "preserve",
+                            contentUnformatted = "pre, code, textarea, p",
                         },
                         hover = true,
                         completion = true,
@@ -122,7 +123,7 @@ return {
                             globals = { "vim" }, -- Prevent "undefined vim" warnings
                         },
                         workspace = {
-                            library = vim.api.nvim_get_runtime_file("", true),
+                            library = { vim.env.VIMRUNTIME },
                             checkThirdParty = false,
                         },
                         format = { enable = true },
@@ -136,29 +137,53 @@ return {
             vim.lsp.config.ts_ls = {
                 cmd = { "typescript-language-server", "--stdio" },
                 filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
-                root_markers = { "package.json", "tsconfig.json", "jsconfig.json", ".git" },
+                root_markers = { "tsconfig.json", "jsconfig.json", "package.json", ".git" },
                 capabilities = capabilities,
+                init_options = {
+                    preferences = {
+                        includeCompletionsWithSnippetText = true,
+                        includeCompletionsForImportStatements = true,
+                        importModuleSpecifierPreference = "relative",
+                    },
+                    hostInfo = "neovim",
+                },
                 settings = {
                     javascript = {
                         validate = true,
                         suggest = {
                             completeFunctionCalls = true,
+                            autoImports = true,
                             includeCompletionsForModuleExports = true,
                             includeCompletionsWithObjectLiteralText = true,
                             includeCompletionsWithClassMemberSnippets = true,
+                            includeAutomaticOptionalChainCompletions = true,
                         },
-                        format = { enable = true },
-                        implicitProjectConfig = { checkJs = true },
+                        format = { enable = false }, -- let prettier/eslint handle formatting
+                        implicitProjectConfig = {
+                            checkJs = true,
+                            experimentalDecorators = true,
+                        },
+                        inlayHints = {
+                            includeInlayParameterNameHints = "literals",
+                        },
                     },
                     typescript = {
                         validate = true,
                         suggest = {
                             completeFunctionCalls = true,
+                            autoImports = true,
                             includeCompletionsForModuleExports = true,
                             includeCompletionsWithObjectLiteralText = true,
                             includeCompletionsWithClassMemberSnippets = true,
+                            includeAutomaticOptionalChainCompletions = true,
                         },
-                        format = { enable = true },
+                        format = { enable = false }, -- let prettier/eslint handle formatting
+                        inlayHints = {
+                            includeInlayParameterNameHints = "literals",
+                        },
+                    },
+                    completions = {
+                        completeFunctionCalls = true,
                     },
                 },
             }
@@ -174,11 +199,13 @@ return {
                 settings = {
                     json = {
                         validate = { enable = true },
-                        schemas = require('schemastore').json.schemas(),
-                        schemaStore = {
-                            enable = true,
-                            url = "https://www.schemastore.org/api/json/catalog.json",
-                        },
+                        schemas = (function()
+                            local ok, schemastore = pcall(require, "schemastore")
+                            if ok then return schemastore.json.schemas() end
+                            return {}
+                        end)(),
+                        -- Disable built-in schema fetching when using SchemaStore.nvim
+                        schemaStore = { enable = false, url = "" },
                     },
                 },
             }
@@ -258,7 +285,7 @@ return {
 
             -- Configure Zig LSP (zls)
             vim.lsp.config.zls = {
-                cmd = { "proot", "-0", "zls" },
+                cmd = require("core.utils").is_android and { "proot", "-0", "zls" } or { "zls" },
                 filetypes = { "zig", "zir" },
                 root_markers = { "zls.json", "build.zig", ".git" },
                 capabilities = capabilities,
@@ -280,7 +307,7 @@ return {
             vim.lsp.config.tailwindcss = {
                 cmd = { "tailwindcss-language-server", "--stdio" },
                 filetypes = { "html", "css", "javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "svelte" },
-                root_markers = { "tailwind.config.js", "tailwind.config.ts", "postcss.config.js", "postcss.config.ts", "package.json", "node_modules", ".git" },
+                root_markers = { "tailwind.config.js", "tailwind.config.ts", "tailwind.config.mjs", "tailwind.config.cjs" },
                 capabilities = capabilities,
                 settings = {
                     tailwindCSS = {
@@ -301,19 +328,29 @@ return {
 
             vim.lsp.enable("tailwindcss")
 
-            -- Configure Java LSP (jdtls)
+            -- Configure Java LSP (jdtls) — portable across Termux and Linux PC
             vim.api.nvim_create_autocmd("FileType", {
                 pattern = "java",
                 callback = function()
-                    local jdtls_path = "/data/data/com.termux/files/home/.local/share/jdtls/bin/jdtls"
+                    local is_android = require("core.utils").is_android
+                    local jdtls_path
+                    if is_android then
+                        jdtls_path = "/data/data/com.termux/files/home/.local/share/jdtls/bin/jdtls"
+                    else
+                        jdtls_path = vim.fn.exepath("jdtls")
+                        if jdtls_path == "" then jdtls_path = "jdtls" end
+                    end
+
                     local root_markers = { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" }
                     local root_dir = require("jdtls.setup").find_root(root_markers)
                     if root_dir == "" then
                         root_dir = vim.fn.getcwd()
                     end
 
-                    local workspace_folder = "/data/data/com.termux/files/home/.local/share/jdtls-workspace/" ..
-                        vim.fn.fnamemodify(root_dir, ":p:h:t")
+                    local workspace_base = is_android
+                        and "/data/data/com.termux/files/home/.local/share/jdtls-workspace/"
+                        or (vim.fn.stdpath("data") .. "/jdtls-workspace/")
+                    local workspace_folder = workspace_base .. vim.fn.fnamemodify(root_dir, ":p:h:t")
 
                     local config = {
                         cmd = { jdtls_path, "-data", workspace_folder },
@@ -324,15 +361,21 @@ return {
                 end,
             })
 
-            -- Setup format on save for all LSP clients
+            -- Format-on-save for ALL LSP clients (jsonls, cssls, html, none-ls, etc.)
+            -- Uses per-buffer augroups to avoid the bug where attaching to a new buffer
+            -- would nuke format-on-save for all previous buffers.
             vim.api.nvim_create_autocmd("LspAttach", {
+                group = vim.api.nvim_create_augroup("LspFormatOnSave", { clear = true }),
                 callback = function(args)
                     local client = vim.lsp.get_client_by_id(args.data.client_id)
-                    if client and client.server_capabilities.documentFormattingProvider then
+                    if client and client:supports_method("textDocument/formatting", args.buf) then
+                        local augroup_name = "LspFormat_" .. args.buf
+                        vim.api.nvim_create_augroup(augroup_name, { clear = true })
                         vim.api.nvim_create_autocmd("BufWritePre", {
+                            group = augroup_name,
                             buffer = args.buf,
                             callback = function()
-                                vim.lsp.buf.format({ bufnr = args.buf, timeout_ms = 5000 })
+                                vim.lsp.buf.format({ async = false })
                             end,
                         })
                     end

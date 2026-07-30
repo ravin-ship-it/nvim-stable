@@ -10,20 +10,39 @@ return {
                     highlight_git = true,
                     root_folder_label = false,
                 },
+                git = {
+                    enable = true,
+                    show_on_dirs = true,
+                    show_on_open_dirs = true,
+                },
                 filters = {
                     dotfiles = false,
                     custom = { "node_modules", ".git" },
                 },
                 filesystem_watchers = {
-                    enable = false,
+                    enable = true,
                 },
                 actions = {
                     open_file = {
                         window_picker = {
-                            enable = true, -- Re-enabled to prompt for window selection
+                            enable = true,
                         },
                     },
                 },
+            })
+
+            -- Refresh NvimTree (including git status) when entering its window
+            vim.api.nvim_create_autocmd("BufEnter", {
+                group = vim.api.nvim_create_augroup("NvimTreeRefresh", { clear = true }),
+                pattern = "NvimTree*",
+                callback = function()
+                    vim.schedule(function()
+                        local api = require("nvim-tree.api")
+                        if api.tree.is_visible() then
+                            api.tree.reload()
+                        end
+                    end)
+                end,
             })
         end
     },
@@ -39,7 +58,7 @@ return {
     -- Diagnostic and Error Indicators
     {
         "folke/trouble.nvim",
-        dependencies = { "kyazdani42/nvim-web-devicons" },
+        dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
             require("trouble").setup()
             vim.keymap.set("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { noremap = true, silent = true })

@@ -195,7 +195,7 @@ return {
             vim.g.user_emmet_mode = "n"
             vim.g.user_emmet_expandabbr_key = "<C-l>" -- Set expansion key to Ctrl+L
             vim.api.nvim_set_keymap("i", "<C-l>", "<Plug>(emmet-expand-abbr)", { noremap = true, silent = true })
-            vim.cmd([[autocmd FileType html,css,scss,sass,jsx,xml,js,ts,json EmmetInstall]])
+            vim.cmd([[autocmd FileType html,css,scss,sass,javascriptreact,typescriptreact,xml,json EmmetInstall]])
         end,
     },
 }
