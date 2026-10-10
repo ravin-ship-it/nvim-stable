@@ -69,7 +69,7 @@ local function start_server(preferred_port)
   local output = ""
 
   stdout:read_start(function(err, data)
-    assert(not err, err)
+    if err then return end
     if data then
       output = output .. data
       local parsed_port = get_actual_port(output)
@@ -83,7 +83,7 @@ local function start_server(preferred_port)
   end)
 
   stderr:read_start(function(err, data)
-    assert(not err, err)
+    if err then return end
     if data then
       echo(data, "ErrorMsg")
     end
@@ -95,7 +95,7 @@ local function stop_server(port)
   if proc then
     proc:kill "sigterm"
     servers[port] = nil
-    echo("Live server stopped at port " .. port .. " 💦 ", "DiagnosticVisualInfo")
+    echo("Live server stopped at port " .. port .. " 💦 ", "DiagnosticInfo")
   else
     echo("No live server found on port " .. port .. " 🥲 ", "DiagnosticWarn")
   end
@@ -107,7 +107,7 @@ local function restart_server(port)
   vim.defer_fn(function()
     start_server(port)
   end, 500)
-  echo("Restarting port " .. port .. " 😗 ", "number")
+  echo("Restarting port " .. port .. " 😗 ", "Special")
 end
 
 local function stop_all_servers()
@@ -115,7 +115,7 @@ local function stop_all_servers()
     proc:kill "sigterm"
     servers[p] = nil
   end
-  echo("All Live server ports killed! 👌👀", "string")
+  echo("All Live server ports killed! 👌👀", "DiagnosticOk")
   update_statusline()
 end
 

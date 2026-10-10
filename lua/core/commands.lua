@@ -1,9 +1,9 @@
 local utils = require("core.utils")
 
--- Helper: close all open terminal buffers before running a new command
+-- Helper: close runner terminal buffers before running a new command (preserves toggleterm)
 local function close_terminal_buffers()
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-        if vim.bo[buf].buftype == "terminal" then
+        if vim.bo[buf].buftype == "terminal" and vim.bo[buf].filetype ~= "toggleterm" then
             vim.api.nvim_buf_delete(buf, { force = true })
         end
     end

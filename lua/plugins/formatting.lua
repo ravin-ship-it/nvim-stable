@@ -10,7 +10,16 @@ return {
         config = function()
             local null_ls = require("null-ls")
             local helpers = require("null-ls.helpers")
-            local eslint = require("none-ls.diagnostics.eslint")
+            local eslint_diag
+            local ok_eslint_d, eslint_d = pcall(require, "none-ls.diagnostics.eslint_d")
+            if ok_eslint_d then
+                eslint_diag = eslint_d
+            else
+                local ok_eslint, eslint = pcall(require, "none-ls.diagnostics.eslint")
+                if ok_eslint then
+                    eslint_diag = eslint
+                end
+            end
 
             -- Set default config path if not set
             if not vim.g.htmlhint_config then
@@ -52,20 +61,30 @@ return {
                     filetypes = { "java" },
                     extra_args = { "--style={BasedOnStyle:Google,IndentWidth:4,ColumnLimit:0,BreakBeforeBinaryOperators:None}" },
                 }),
-                eslint.with({
-                    diagnostics_format = "[eslint] #{m}\n(#{c})",
-                    condition = function(utils)
-                        return utils.root_has_file({
-                            ".eslintrc",
-                            ".eslintrc.js",
-                            ".eslintrc.cjs",
-                            ".eslintrc.yaml",
-                            ".eslintrc.yml",
-                            ".eslintrc.json",
-                        })
-                    end,
-                }),
             }
+
+            if eslint_diag then
+                table.insert(
+                    sources,
+                    eslint_diag.with({
+                        diagnostics_format = "[eslint] #{m}\n(#{c})",
+                        condition = function(utils)
+                            return utils.root_has_file({
+                                ".eslintrc",
+                                ".eslintrc.js",
+                                ".eslintrc.cjs",
+                                ".eslintrc.yaml",
+                                ".eslintrc.yml",
+                                ".eslintrc.json",
+                                "eslint.config.js",
+                                "eslint.config.mjs",
+                                "eslint.config.cjs",
+                                "eslint.config.ts",
+                            })
+                        end,
+                    })
+                )
+            end
 
             if vim.fn.executable("htmlhint") == 1 or
                 vim.fn.executable(vim.fn.stdpath("data") .. "/mason/bin/htmlhint") == 1 then

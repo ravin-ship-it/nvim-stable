@@ -126,30 +126,24 @@ return {
         config = function()
             require("Comment").setup({ ignore = '^%s*$' })
 
-            -- Import the Comment APIs
-            -- Normal Mode: Toggle comments with Ctrl+/
-            vim.api.nvim_set_keymap(
-                "n",
-                "<C-_>", -- Note: <C-_> is often used for Ctrl+/
-                [[<cmd>lua require('Comment.api').toggle.linewise.current()<CR>]],
-                { noremap = true, silent = true }
-            )
+            -- Toggle comments with Ctrl+/ in normal, visual, and insert modes
+            -- Note: Map both <C-/> and <C-_> because terminal emulators send different codes:
+            -- Modern terminals (Ghostty, WezTerm, Kitty, Alacritty) send <C-/>,
+            -- while legacy/xterm/TTY environments send <C-_>.
+            local set = vim.keymap.set
+            local opts = { remap = true, silent = true }
 
-            -- Visual Mode: Toggle comments with Ctrl+/
-            vim.api.nvim_set_keymap(
-                "v",
-                "<C-_>",
-                [[<esc><cmd>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>]],
-                { noremap = true, silent = true }
-            )
+            -- Normal Mode: Toggle comments
+            set("n", "<C-/>", "<Plug>(comment_toggle_linewise_current)", vim.tbl_extend("force", opts, { desc = "Toggle comment" }))
+            set("n", "<C-_>", "<Plug>(comment_toggle_linewise_current)", vim.tbl_extend("force", opts, { desc = "Toggle comment" }))
 
-            -- Insert Mode: Toggle comments with Ctrl+/ (cursor returns to insert mode)
-            vim.api.nvim_set_keymap(
-                "i",
-                "<C-_>",
-                [[<Esc><cmd>lua require('Comment.api').toggle.linewise.current()<CR>gi]],
-                { noremap = true, silent = true }
-            )
+            -- Visual Mode: Toggle comments for selection
+            set("x", "<C-/>", "<Plug>(comment_toggle_linewise_visual)", vim.tbl_extend("force", opts, { desc = "Toggle comment" }))
+            set("x", "<C-_>", "<Plug>(comment_toggle_linewise_visual)", vim.tbl_extend("force", opts, { desc = "Toggle comment" }))
+
+            -- Insert Mode: Toggle comments and return to insert mode
+            set("i", "<C-/>", "<Esc><Plug>(comment_toggle_linewise_current)gi", vim.tbl_extend("force", opts, { desc = "Toggle comment" }))
+            set("i", "<C-_>", "<Esc><Plug>(comment_toggle_linewise_current)gi", vim.tbl_extend("force", opts, { desc = "Toggle comment" }))
         end,
     },
 
@@ -192,9 +186,9 @@ return {
     {
         "mattn/emmet-vim",
         config = function()
-            vim.g.user_emmet_mode = "n"
+            vim.g.user_emmet_mode = "inv" -- Enable in insert, normal, and visual modes
             vim.g.user_emmet_expandabbr_key = "<C-l>" -- Set expansion key to Ctrl+L
-            vim.api.nvim_set_keymap("i", "<C-l>", "<Plug>(emmet-expand-abbr)", { noremap = true, silent = true })
+            vim.keymap.set("i", "<C-l>", "<Plug>(emmet-expand-abbr)", { remap = true, silent = true, desc = "Emmet expand" })
             vim.cmd([[autocmd FileType html,css,scss,sass,javascriptreact,typescriptreact,xml,json EmmetInstall]])
         end,
     },

@@ -96,9 +96,14 @@ if utils.is_android then
                     local emoji = f:read("*a")
                     f:close()
                     os.remove(tmp)
-                    if emoji and emoji ~= "" then
-                        vim.api.nvim_put({ emoji }, "c", false, true)
+                    if emoji then
+                        emoji = emoji:gsub("[\r\n]+$", "")
+                        if emoji ~= "" then
+                            vim.api.nvim_put({ emoji }, "c", false, true)
+                        end
                     end
+                else
+                    os.remove(tmp)
                 end
             end
         })

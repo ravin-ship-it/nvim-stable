@@ -10,7 +10,7 @@ return {
     },
     config = function()
       local cmp = require "cmp"
-      local cmp_autopairs = require "nvim-autopairs.completion.cmp"
+
 
       cmp.setup {
         performance = {
@@ -95,7 +95,10 @@ return {
       })
 
       -- Integrate nvim-autopairs with cmp
-      cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
+      local autopairs_ok, cmp_autopairs = pcall(require, "nvim-autopairs.completion.cmp")
+      if autopairs_ok then
+        cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
+      end
     end,
   },
 

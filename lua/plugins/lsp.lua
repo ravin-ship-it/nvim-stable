@@ -330,6 +330,7 @@ return {
 
             -- Configure Java LSP (jdtls) — portable across Termux and Linux PC
             vim.api.nvim_create_autocmd("FileType", {
+                group = vim.api.nvim_create_augroup("JdtlsSetup", { clear = true }),
                 pattern = "java",
                 callback = function()
                     local is_android = require("core.utils").is_android
@@ -343,7 +344,7 @@ return {
 
                     local root_markers = { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" }
                     local root_dir = require("jdtls.setup").find_root(root_markers)
-                    if root_dir == "" then
+                    if not root_dir or root_dir == "" then
                         root_dir = vim.fn.getcwd()
                     end
 

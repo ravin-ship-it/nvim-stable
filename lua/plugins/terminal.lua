@@ -134,16 +134,21 @@ return {
             vim.keymap.set("n", "<PageUp>", "<C-u>", { desc = "Scroll Window Up" })
             vim.keymap.set("n", "<PageDown>", "<C-d>", { desc = "Scroll Window Down" })
 
-            -- Set up keymaps for regular :term command (not toggleterm)
+            -- Set up keymaps for terminal windows (toggleterm and :term)
             local function set_terminal_keymaps()
-                -- Terminal mode mappings
+                -- Terminal mode mappings for easy window navigation
                 local opts = { buffer = 0 }
-                -- <Esc> is handled globally above now
                 vim.keymap.set('t', '<C-h>', [[<Cmd>wincmd h<CR>]], opts)
                 vim.keymap.set('t', '<C-j>', [[<Cmd>wincmd j<CR>]], opts)
                 vim.keymap.set('t', '<C-k>', [[<Cmd>wincmd k<CR>]], opts)
                 vim.keymap.set('t', '<C-l>', [[<Cmd>wincmd l<CR>]], opts)
             end
+
+            vim.api.nvim_create_autocmd("TermOpen", {
+                group = vim.api.nvim_create_augroup("TerminalNavKeymaps", { clear = true }),
+                pattern = "term://*",
+                callback = set_terminal_keymaps,
+            })
 
             -- Normal mode keymaps for toggleterm
             vim.keymap.set("n", "<leader>tf", function() toggle_term_in_dir("float") end, { desc = "ToggleTerm Float" })
