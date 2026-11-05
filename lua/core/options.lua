@@ -16,9 +16,24 @@ vim.opt.number = true                                     -- Enable absolute lin
 vim.opt.relativenumber = false                            -- Enable relative line numbers
 vim.opt.tabstop = 4                                       -- Set tab width to 4 spaces
 vim.opt.shiftwidth = 4                                    -- Set indentation width to 4 spaces
+vim.opt.softtabstop = 4                                   -- Number of spaces that a <Tab> counts for while editing
+vim.opt.shiftround = true                                 -- Round indent to multiple of 'shiftwidth'
 vim.opt.expandtab = true                                  -- Use spaces instead of tabs
 vim.opt.smartindent = true                                -- Enable smart indentation
 vim.opt.autoindent = true                                 -- Enable automatic indentation for new lines
+
+-- Python indentation: enforce strict 4-space indent
+-- Neovim/Vim defaults to 8 spaces (shiftwidth * 2) inside open parens/brackets
+-- and aligns closing braces with the inner block instead of the opener.
+vim.g.pyindent_open_paren = "shiftwidth()"
+vim.g.pyindent_nested_paren = "shiftwidth()"
+vim.g.pyindent_continue = "shiftwidth()"
+vim.g.python_indent = {
+    open_paren = "shiftwidth()",
+    nested_paren = "shiftwidth()",
+    continue = "shiftwidth()",
+    closed_paren_align_last_line = false,
+}
 vim.opt.termguicolors = true                              -- Enable true color support
 vim.opt.mouse = "a"                                       -- Enable mouse support
 vim.opt.clipboard = "unnamedplus"                         -- Sync with system clipboard

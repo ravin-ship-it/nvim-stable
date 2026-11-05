@@ -43,6 +43,20 @@ autocmd("FileType", {
     end,
 })
 
+-- Python strict 4-space indentation
+autocmd("FileType", {
+    group = augroup("PythonIndent", { clear = true }),
+    pattern = "python",
+    callback = function()
+        vim.opt_local.tabstop = 4
+        vim.opt_local.shiftwidth = 4
+        vim.opt_local.softtabstop = 4
+        vim.opt_local.expandtab = true
+        vim.opt_local.autoindent = true
+        vim.opt_local.smartindent = false
+    end,
+})
+
 -- Reset htmlangular filetype to html
 autocmd("FileType", {
     group = augroup("HtmlAngularFix", { clear = true }),
